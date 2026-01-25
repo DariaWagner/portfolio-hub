@@ -14,6 +14,13 @@ except Exception:
 st.set_page_config(page_title="Produktions-KPIs (Pandas)", layout="wide")
 
 st.title("📈 Produktionsprozess-KPIs (Pandas)")
+
+st.caption(
+    "Hinweis: Die verwendeten Daten sind synthetisch (KI-generiert) "
+    "und wurden zur realistischen Simulation industrieller Produktionsdaten erstellt."
+)
+
+
 st.write("Interaktives KPI-Dashboard auf Basis des Produktionsdatensatzes.")
 
 with st.expander("📥 Optional: CSV hochladen (überschreibt Repo-Datei)", expanded=False):

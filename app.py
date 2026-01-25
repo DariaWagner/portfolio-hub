@@ -8,6 +8,14 @@ st.set_page_config(
 
 st.title("📊 Data & Process Analytics – Portfolio")
 
+st.info(
+    "ℹ️ Die in diesem Portfolio verwendeten Datensätze sind **synthetisch (KI-generiert)** "
+    "und dienen der realistischen Simulation industrieller Produktions- und Prozessdaten. "
+    "Der Fokus liegt auf Analyse-Logik, KPI-Definition, Datenstruktur und Visualisierung – "
+    "nicht auf sensiblen Echtdaten."
+)
+
+
 st.write(
     "Willkommen in meinem Portfolio. "
     "Hier sehen Sie praxisnahe Analysen auf Basis eines konsistenten Produktionsdatensatzes "
@@ -35,3 +43,4 @@ with c2:
         "- SQL-Queries\n"
         "- Ergebnis + Visualisierung"
     )
+

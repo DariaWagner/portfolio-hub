@@ -13,6 +13,12 @@ except Exception:
 st.set_page_config(page_title="SQL Data Analysis", layout="wide")
 st.title("🗄️ SQL Data Analysis (auf Basis des CSV)")
 
+st.caption(
+    "Hinweis: Die verwendeten Daten sind synthetisch (KI-generiert) "
+    "und dienen der Demonstration von SQL-Analyse- und Reporting-Workflows."
+)
+
+
 st.write(
     "Diese Seite zeigt typische Business-Fragen und die passenden SQL-Queries. "
     "Die Ergebnisse werden direkt aus dem Datensatz berechnet und visualisiert."

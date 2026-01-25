@@ -7,6 +7,12 @@ from services.data_loader import load_data
 st.set_page_config(page_title="OOP Reporting", layout="wide")
 st.title("🧩 OOP: Business-Reporting auf Produktionsdaten")
 
+st.caption(
+    "Hinweis: Die zugrunde liegenden Daten sind synthetisch (KI-generiert). "
+    "Der Fokus liegt auf objektorientierter Strukturierung und Business-Logik."
+)
+
+
 st.write(
     "Diese Seite zeigt, wie man Business-Logik mit OOP kapselt: "
     "Daten laden → Report erzeugen → Top-Insights als strukturierte Ausgabe."
