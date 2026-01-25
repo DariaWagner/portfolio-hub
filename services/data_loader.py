@@ -1,24 +1,17 @@
-from pathlib import Path
+from __future__ import annotations
+
 import pandas as pd
 import streamlit as st
 
-DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "produktionsdaten_premium_5Jahre.csv"
 
-@st.cache_data
-def load_data(uploaded_file=None) -> pd.DataFrame:
+CSV_PATH = "data/produktionsdaten_premium_5Jahre.csv"
+
+
+@st.cache_data(show_spinner=False)
+def load_production_data() -> pd.DataFrame:
     """
-    Loads the production CSV either from upload or from repo /data.
-    Performs minimal parsing & column normalization.
+    Lädt den Produktionsdatensatz aus dem Repository.
+    Wird gecached, damit Streamlit schneller bleibt.
     """
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_csv(DATA_PATH)
-
-    # Parse date if available
-    if "Datum" in df.columns:
-        df["Datum"] = pd.to_datetime(df["Datum"], errors="coerce")
-
-    # Normalize common columns if present (no renaming here except safe)
-    # Keep original German column names as they are in your CSV.
+    df = pd.read_csv(CSV_PATH)
     return df
