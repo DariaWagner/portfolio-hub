@@ -1,184 +1,195 @@
 import streamlit as st
 import pandas as pd
 
-
+# --------------------------------------------------
 # Page config
-
-st.set_page_config(page_title="SQL Data Analysis", layout="wide")
+# --------------------------------------------------
+st.set_page_config(
+    page_title="SQL Data Analysis",
+    layout="wide"
+)
 
 st.title("SQL Data Analysis")
+
 st.write(
     "Diese Seite zeigt SQL-nahe, relationale Analysen "
     "auf Basis eines normalisierten Produktionsdatenmodells."
 )
 
-
-# Data loading
-
-@st.cache_data
-def load_data():
-    return pd.read_csv(
-        "data/produktionsdaten_premium_5Jahre.csv"
-    )
-
-df = load_data()
-
-
-# Data Disclaimer
-
-st.markdown(
-    """
-    **Data Disclaimer**
-
-    Die verwendeten Daten sind synthetisch (KI-generiert) und simulieren
-    reale industrielle Produktions- und Prozessdaten.
-    Es werden keine echten Unternehmensdaten verwendet.
-    """
+st.write(
+    "Die verwendeten Daten sind synthetisch (KI-generiert) "
+    "und simulieren reale industrielle Produktions- und Prozessdaten. "
+    "Es werden keine echten Unternehmensdaten verwendet."
 )
 
 st.divider()
 
+# --------------------------------------------------
+# Data loading
+# --------------------------------------------------
+@st.cache_data
+def load_data():
+    return pd.read_csv("data/produktionsdaten_premium_5Jahre.csv")
 
-# Relational data model (logical split)
+df = load_data()
 
+# --------------------------------------------------
+# Relationales Datenmodell (logisch)
+# --------------------------------------------------
 st.header("Relationales Datenmodell (logisch)")
 
 st.write(
-    "Der ursprüngliche CSV-Datensatz wird logisch in "
-    "mehrere relationale Tabellen aufgeteilt."
+    "Der ursprüngliche CSV-Datensatz wird logisch in mehrere "
+    "relationale Tabellen aufgeteilt. Jede Tabelle besitzt "
+    "eine eindeutige ID und eine klare fachliche Bedeutung."
 )
 
-# Dimension tables
-dim_date = (
-    df[["Datum", "Jahr", "Monat"]]
+# Dimension: Datum
+dim_datum = (
+    df[["Datum"]]
     .drop_duplicates()
-    .sort_values("Datum")
+    .assign(
+        Jahr=lambda x: pd.to_datetime(x["Datum"]).dt.year,
+        Monat=lambda x: pd.to_datetime(x["Datum"]).dt.month
+    )
     .reset_index(drop=True)
 )
-dim_date["date_id"] = dim_date.index + 1
+dim_datum["datum_id"] = dim_datum.index + 1
 
-dim_line = (
-    df[["Linie"]]
+# Dimension: Produktionslinie
+dim_linie = (
+    df[["Produktionslinie"]]
     .drop_duplicates()
     .reset_index(drop=True)
 )
-dim_line["line_id"] = dim_line.index + 1
+dim_linie["linie_id"] = dim_linie.index + 1
 
-dim_shift = (
+# Dimension: Schicht
+dim_schicht = (
     df[["Schicht"]]
     .drop_duplicates()
     .reset_index(drop=True)
 )
-dim_shift["shift_id"] = dim_shift.index + 1
+dim_schicht["schicht_id"] = dim_schicht.index + 1
 
-dim_product = (
-    df[["Produkt"]]
-    .drop_duplicates()
-    .reset_index(drop=True)
-)
-dim_product["product_id"] = dim_product.index + 1
+# Fact-Tabelle
+fact = df.merge(dim_datum, on="Datum") \
+         .merge(dim_linie, on="Produktionslinie") \
+         .merge(dim_schicht, on="Schicht")
 
-# Fact table
-fact_production = df.merge(dim_date, on=["Datum", "Jahr", "Monat"]) \
-    .merge(dim_line, on="Linie") \
-    .merge(dim_shift, on="Schicht") \
-    .merge(dim_product, on="Produkt")
+fact_produktion = fact[[
+    "datum_id",
+    "linie_id",
+    "schicht_id",
+    "Stueckzahl",
+    "Ausschuss",
+    "Stillstandszeit_Min",
+    "Energieverbrauch_kWh"
+]]
 
-fact_production = fact_production[
-    [
-        "date_id",
-        "line_id",
-        "shift_id",
-        "product_id",
-        "Output",
-        "Ausschuss",
-        "Stillstand_min",
-        "Energie_kWh",
-        "Materialkosten"
-    ]
-]
-
-
-# Display tables (SQL-style)
-
+# --------------------------------------------------
+# Tabellen anzeigen
+# --------------------------------------------------
 st.subheader("Dimension: Datum")
-st.dataframe(dim_date, use_container_width=True)
+st.dataframe(dim_datum, use_container_width=True)
 
 st.subheader("Dimension: Produktionslinie")
-st.dataframe(dim_line, use_container_width=True)
+st.dataframe(dim_linie, use_container_width=True)
 
 st.subheader("Dimension: Schicht")
-st.dataframe(dim_shift, use_container_width=True)
+st.dataframe(dim_schicht, use_container_width=True)
 
-st.subheader("Dimension: Produkt")
-st.dataframe(dim_product, use_container_width=True)
-
-st.subheader("Faktentabelle: Produktion")
-st.dataframe(fact_production, use_container_width=True)
+st.subheader("Fact: Produktion")
+st.dataframe(fact_produktion.head(50), use_container_width=True)
 
 st.divider()
 
+# --------------------------------------------------
+# KPI 1 – Gesamtproduktion
+# --------------------------------------------------
+st.header("KPI: Gesamtproduktion & Ausschussquote")
 
-# SQL-like KPI queries (tabular only)
+kpi_gesamt = pd.DataFrame({
+    "Gesamtstückzahl": [fact_produktion["Stueckzahl"].sum()],
+    "Gesamtausschuss": [fact_produktion["Ausschuss"].sum()],
+})
 
-st.header("SQL-nahe KPI-Abfragen")
+kpi_gesamt["Ausschussquote (%)"] = (
+    kpi_gesamt["Gesamtausschuss"]
+    / kpi_gesamt["Gesamtstückzahl"] * 100
+).round(2)
 
-# KPI 1: Ausschussquote nach Linie
-kpi_scrap = (
-    fact_production
-    .merge(dim_line, on="line_id")
-    .groupby("Linie", as_index=False)
+st.dataframe(kpi_gesamt, use_container_width=True)
+
+# --------------------------------------------------
+# KPI 2 – Nach Produktionslinie
+# --------------------------------------------------
+st.header("KPI: Produktion nach Produktionslinie")
+
+kpi_linie = (
+    fact_produktion
+    .merge(dim_linie, on="linie_id")
+    .groupby("Produktionslinie", as_index=False)
     .agg(
-        Output=("Output", "sum"),
-        Ausschuss=("Ausschuss", "sum")
+        Gesamtstückzahl=("Stueckzahl", "sum"),
+        Gesamtausschuss=("Ausschuss", "sum")
     )
 )
 
-kpi_scrap["Ausschussquote_%"] = (
-    kpi_scrap["Ausschuss"] / kpi_scrap["Output"] * 100
+kpi_linie["Ausschussquote (%)"] = (
+    kpi_linie["Gesamtausschuss"]
+    / kpi_linie["Gesamtstückzahl"] * 100
 ).round(2)
 
-st.subheader("Ausschussquote nach Produktionslinie")
-st.dataframe(kpi_scrap, use_container_width=True)
+st.dataframe(kpi_linie, use_container_width=True)
 
-# KPI 2: Stillstandszeit nach Schicht
-kpi_downtime = (
-    fact_production
-    .merge(dim_shift, on="shift_id")
+# --------------------------------------------------
+# KPI 3 – Nach Schicht
+# --------------------------------------------------
+st.header("KPI: Produktion nach Schicht")
+
+kpi_schicht = (
+    fact_produktion
+    .merge(dim_schicht, on="schicht_id")
     .groupby("Schicht", as_index=False)
     .agg(
-        Stillstand_min=("Stillstand_min", "sum")
+        Gesamtstückzahl=("Stueckzahl", "sum"),
+        Gesamtausschuss=("Ausschuss", "sum")
     )
 )
 
-st.subheader("Stillstandszeit nach Schicht")
-st.dataframe(kpi_downtime, use_container_width=True)
-
-# KPI 3: Energieverbrauch pro Produkt
-kpi_energy = (
-    fact_production
-    .merge(dim_product, on="product_id")
-    .groupby("Produkt", as_index=False)
-    .agg(
-        Energie_kWh=("Energie_kWh", "sum"),
-        Output=("Output", "sum")
-    )
-)
-
-kpi_energy["Energie_pro_Stück"] = (
-    kpi_energy["Energie_kWh"] / kpi_energy["Output"]
+kpi_schicht["Ausschussquote (%)"] = (
+    kpi_schicht["Gesamtausschuss"]
+    / kpi_schicht["Gesamtstückzahl"] * 100
 ).round(2)
 
-st.subheader("Energieverbrauch pro Produkt")
-st.dataframe(kpi_energy, use_container_width=True)
+st.dataframe(kpi_schicht, use_container_width=True)
+
+# --------------------------------------------------
+# KPI 4 – Energie pro Stück
+# --------------------------------------------------
+st.header("KPI: Energieverbrauch pro Stück")
+
+kpi_energie = (
+    fact_produktion
+    .merge(dim_linie, on="linie_id")
+    .groupby("Produktionslinie", as_index=False)
+    .agg(
+        Energie_kWh=("Energieverbrauch_kWh", "sum"),
+        Stueckzahl=("Stueckzahl", "sum")
+    )
+)
+
+kpi_energie["kWh pro Stück"] = (
+    kpi_energie["Energie_kWh"]
+    / kpi_energie["Stueckzahl"]
+).round(2)
+
+st.dataframe(kpi_energie[["Produktionslinie", "kWh pro Stück"]], use_container_width=True)
 
 st.divider()
 
-
-# Repository link
-
-st.markdown(
-    "Repository: "
-    "[sql-data-analysis ansehen]"
-    "(https://github.com/DariaWagner/sql-data-analysis)"
+st.write(
+    "Diese Tabellen entsprechen fachlich den SQL-Queries "
+    "im zugehörigen GitHub-Repository."
 )
