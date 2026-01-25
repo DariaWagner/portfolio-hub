@@ -1,132 +1,119 @@
 import streamlit as st
+import pandas as pd
 from dataclasses import dataclass
 from typing import List
 
-# --------------------------------------------------
-# Page config
-# --------------------------------------------------
-st.set_page_config(page_title="OOP Bestellverwaltung", layout="wide")
+from services.data_loader import load_production_data
 
-st.title("OOP-Projekt: Bestellverwaltung")
+st.set_page_config(page_title="OOP – Produktionsmodell", layout="wide")
+st.title("OOP-Modellierung eines Produktionsprozesses")
+
 st.write(
-    "Diese Seite zeigt ein **objektorientiertes Python-Beispiel**: "
-    "ein Bestellprozess mit Klassen, Beziehungen und Business-Logik."
-)
-st.divider()
-
-# --------------------------------------------------
-# 1) Mini-Klassenmodell (kurz)
-# --------------------------------------------------
-st.header("Mini-Klassenmodell (Übersicht)")
-
-st.markdown(
     """
-    - **Produkt**: Name, Preis  
-    - **Bestellposition**: Produkt + Menge  
-    - **Bestellung**: Liste von Positionen, berechnet Summe  
-    - **Zahlung**: Zahlungsart + Status (vereinfacht)
+    Diese Seite zeigt, wie ein Produktionsdatensatz **objektorientiert modelliert**
+    und ausgewertet werden kann – auf Basis desselben CSVs wie die KPI-Analyse.
     """
 )
 
 st.divider()
 
 # --------------------------------------------------
-# 2) Live-Demo: “Ergebnis zeigen”
+# OOP-Modelle
 # --------------------------------------------------
-st.header("Live-Demo: Bestellung berechnen")
+@dataclass
+class ProductionRecord:
+    datum: pd.Timestamp
+    linie: str
+    stueckzahl: int
+    ausschuss: int
+    energie_kwh: float
+    stillstand_min: float
 
-# --- Demo-Klassen (klein, aber „echt“)
-@dataclass(frozen=True)
-class Produkt:
+    def scrap_rate(self) -> float:
+        return (self.ausschuss / self.stueckzahl) * 100 if self.stueckzahl else 0.0
+
+    def energy_per_unit(self) -> float:
+        return self.energie_kwh / self.stueckzahl if self.stueckzahl else 0.0
+
+
+@dataclass
+class ProductionLine:
     name: str
-    preis: float
+    records: List[ProductionRecord]
 
-@dataclass
-class Bestellposition:
-    produkt: Produkt
-    menge: int
+    def total_output(self) -> int:
+        return sum(r.stueckzahl for r in self.records)
 
-    def positionswert(self) -> float:
-        return self.produkt.preis * self.menge
+    def total_downtime(self) -> float:
+        return sum(r.stillstand_min for r in self.records)
 
-@dataclass
-class Bestellung:
-    kunde: str
-    positionen: List[Bestellposition]
+    def avg_scrap_rate(self) -> float:
+        if not self.records:
+            return 0.0
+        return sum(r.scrap_rate() for r in self.records) / len(self.records)
 
-    def gesamtbetrag(self) -> float:
-        return sum(p.positionswert() for p in self.positionen)
 
-    def artikelanzahl(self) -> int:
-        return sum(p.menge for p in self.positionen)
+# --------------------------------------------------
+# Daten laden & Objekte bauen
+# --------------------------------------------------
+df = load_production_data()
 
-# --- UI: Beispielprodukte
-produkte = [
-    Produkt("Apfelsaft", 1.99),
-    Produkt("Brot", 2.49),
-    Produkt("Käse", 3.79),
+records = [
+    ProductionRecord(
+        datum=row["Datum"],
+        linie=row["Produktionslinie"],
+        stueckzahl=row["Stueckzahl"],
+        ausschuss=row["Ausschuss"],
+        energie_kwh=row["Energieverbrauch_kWh"],
+        stillstand_min=row["Stillstandszeit_Min"],
+    )
+    for _, row in df.iterrows()
 ]
 
-col1, col2 = st.columns([1, 1])
+linien_namen = sorted(df["Produktionslinie"].dropna().unique())
+linien_objekte = {
+    name: ProductionLine(
+        name=name,
+        records=[r for r in records if r.linie == name],
+    )
+    for name in linien_namen
+}
 
-with col1:
-    kunde = st.text_input("Kunde", value="Max Mustermann")
-    p1 = st.selectbox("Produkt 1", produkte, format_func=lambda x: f"{x.name} ({x.preis:.2f}€)")
-    m1 = st.number_input("Menge 1", min_value=0, value=2, step=1)
+# --------------------------------------------------
+# Live-Demo
+# --------------------------------------------------
+st.header("Live-Demo: Produktionslinie analysieren")
 
-    p2 = st.selectbox("Produkt 2", produkte, index=1, format_func=lambda x: f"{x.name} ({x.preis:.2f}€)")
-    m2 = st.number_input("Menge 2", min_value=0, value=1, step=1)
+linie = st.selectbox("Produktionslinie", linien_namen)
+obj = linien_objekte[linie]
 
-with col2:
-    st.subheader("Ergebnis")
-    positionen = []
-    if m1 > 0:
-        positionen.append(Bestellposition(p1, int(m1)))
-    if m2 > 0:
-        positionen.append(Bestellposition(p2, int(m2)))
+col1, col2, col3 = st.columns(3)
 
-    bestellung = Bestellung(kunde=kunde, positionen=positionen)
-
-    st.metric("Artikel (gesamt)", bestellung.artikelanzahl())
-    st.metric("Gesamtbetrag", f"{bestellung.gesamtbetrag():.2f} €")
-
-    if positionen:
-        st.write("Positionen:")
-        for pos in positionen:
-            st.write(f"- {pos.produkt.name} × {pos.menge} = {pos.positionswert():.2f} €")
-    else:
-        st.info("Wähle mindestens eine Menge > 0.")
+col1.metric("Gesamtstückzahl", f"{obj.total_output():,}")
+col2.metric("Gesamtstillstand (Min)", f"{obj.total_downtime():,.0f}")
+col3.metric("Ø Ausschussquote (%)", f"{obj.avg_scrap_rate():.2f}")
 
 st.divider()
 
 # --------------------------------------------------
-# 3) Code-Beispiel (kurz & HR-tauglich)
+# Code-Ausschnitt
 # --------------------------------------------------
-st.header("Code-Beispiel (Ausschnitt)")
+st.header("Code-Beispiel (OOP-Modell)")
 
 st.code(
     """@dataclass
-class Bestellposition:
-    produkt: Produkt
-    menge: int
+class ProductionRecord:
+    stueckzahl: int
+    ausschuss: int
 
-    def positionswert(self) -> float:
-        return self.produkt.preis * self.menge
-
-@dataclass
-class Bestellung:
-    kunde: str
-    positionen: List[Bestellposition]
-
-    def gesamtbetrag(self) -> float:
-        return sum(p.positionswert() for p in self.positionen)""",
+    def scrap_rate(self) -> float:
+        return (self.ausschuss / self.stueckzahl) * 100 if self.stueckzahl else 0.0""",
     language="python",
 )
 
 st.divider()
 
-# --------------------------------------------------
-# Repo Link
-# --------------------------------------------------
-st.header("Repository")
-st.markdown("[GitHub Repository – python-oop-basics](https://github.com/DariaWagner/python-oop-basics)")
+st.write(
+    "Dieses OOP-Modell ist bewusst einfach gehalten, aber direkt "
+    "auf reale Produktionsdaten übertragbar."
+)
