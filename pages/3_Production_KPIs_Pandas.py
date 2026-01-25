@@ -146,16 +146,19 @@ kpi_line = (
 )
 
 kpi_line["Ausschussquote (%)"] = (
-    (kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"]) * 100
-).replace([pd.NA, float("inf")], pd.NA).fillna(0).round(2)
+    (kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+).fillna(0).round(2)
 
-st.dataframe(kpi_line.sort_values("Ausschussquote (%)", ascending=False), use_container_width=True)
+st.dataframe(
+    kpi_line.sort_values("Ausschussquote (%)", ascending=False),
+    use_container_width=True
+)
 
-fig = plt.figure()
-plt.bar(kpi_line["Produktionslinie"].astype(str), kpi_line["Ausschussquote (%)"])
-plt.xticks(rotation=45, ha="right")
-plt.ylabel("Ausschussquote (%)")
-plt.xlabel("Produktionslinie")
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.bar(kpi_line["Produktionslinie"].astype(str), kpi_line["Ausschussquote (%)"])
+ax.set_ylabel("Ausschussquote (%)")
+ax.set_xlabel("Produktionslinie")
+ax.tick_params(axis="x", rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
 
@@ -177,15 +180,18 @@ kpi_shift = (
 )
 
 kpi_shift["Ausschussquote (%)"] = (
-    (kpi_shift["Gesamtausschuss"] / kpi_shift["Gesamtstückzahl"]) * 100
-).replace([pd.NA, float("inf")], pd.NA).fillna(0).round(2)
+    (kpi_shift["Gesamtausschuss"] / kpi_shift["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+).fillna(0).round(2)
 
-st.dataframe(kpi_shift.sort_values("Stillstand_Min", ascending=False), use_container_width=True)
+st.dataframe(
+    kpi_shift.sort_values("Stillstand_Min", ascending=False),
+    use_container_width=True
+)
 
-fig = plt.figure()
-plt.bar(kpi_shift["Schicht"].astype(str), kpi_shift["Stillstand_Min"])
-plt.ylabel("Stillstand (Minuten)")
-plt.xlabel("Schicht")
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.bar(kpi_shift["Schicht"].astype(str), kpi_shift["Stillstand_Min"])
+ax.set_ylabel("Stillstand (Minuten)")
+ax.set_xlabel("Schicht")
 plt.tight_layout()
 st.pyplot(fig)
 
@@ -210,24 +216,30 @@ trend = (
 )
 
 trend["Ausschussquote (%)"] = (
-    (trend["Gesamtausschuss"] / trend["Gesamtstückzahl"]) * 100
-).replace([pd.NA, float("inf")], pd.NA).fillna(0).round(2)
+    (trend["Gesamtausschuss"] / trend["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+).fillna(0).round(2)
 
 st.dataframe(trend, use_container_width=True)
 
-fig = plt.figure()
-plt.plot(trend["JahrMonat"], trend["Gesamtstückzahl"])
-plt.xticks(rotation=45, ha="right")
-plt.ylabel("Gesamtstückzahl")
-plt.xlabel("Monat")
+# ✅ nur jeden 6. Monat beschriften (lesbar!)
+step = 6 if len(trend) > 24 else 3 if len(trend) > 12 else 1
+xt = trend["JahrMonat"][::step]
+
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(trend["JahrMonat"], trend["Gesamtstückzahl"])
+ax.set_ylabel("Gesamtstückzahl")
+ax.set_xlabel("Monat")
+ax.set_xticks(xt)
+ax.set_xticklabels(xt, rotation=45, ha="right")
 plt.tight_layout()
 st.pyplot(fig)
 
-fig = plt.figure()
-plt.plot(trend["JahrMonat"], trend["Ausschussquote (%)"])
-plt.xticks(rotation=45, ha="right")
-plt.ylabel("Ausschussquote (%)")
-plt.xlabel("Monat")
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(trend["JahrMonat"], trend["Ausschussquote (%)"])
+ax.set_ylabel("Ausschussquote (%)")
+ax.set_xlabel("Monat")
+ax.set_xticks(xt)
+ax.set_xticklabels(xt, rotation=45, ha="right")
 plt.tight_layout()
 st.pyplot(fig)
 
@@ -239,18 +251,20 @@ st.divider()
 st.header("Energieverbrauch pro Stück nach Produktionslinie")
 
 energy = kpi_line[["Produktionslinie", "Energie_kWh", "Gesamtstückzahl"]].copy()
-energy["kWh pro Stück"] = (energy["Energie_kWh"] / energy["Gesamtstückzahl"]).replace(
-    [pd.NA, float("inf")], pd.NA
+energy["kWh pro Stück"] = (
+    energy["Energie_kWh"] / energy["Gesamtstückzahl"].replace(0, pd.NA)
 ).fillna(0).round(3)
 
-st.dataframe(energy[["Produktionslinie", "kWh pro Stück"]].sort_values("kWh pro Stück", ascending=False),
-             use_container_width=True)
+st.dataframe(
+    energy[["Produktionslinie", "kWh pro Stück"]].sort_values("kWh pro Stück", ascending=False),
+    use_container_width=True
+)
 
-fig = plt.figure()
-plt.bar(energy["Produktionslinie"].astype(str), energy["kWh pro Stück"])
-plt.xticks(rotation=45, ha="right")
-plt.ylabel("kWh pro Stück")
-plt.xlabel("Produktionslinie")
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.bar(energy["Produktionslinie"].astype(str), energy["kWh pro Stück"])
+ax.set_ylabel("kWh pro Stück")
+ax.set_xlabel("Produktionslinie")
+ax.tick_params(axis="x", rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
 
