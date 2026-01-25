@@ -1,79 +1,84 @@
 # Data & Process Analytics – Portfolio (Streamlit)
 
-Dieses Repository enthält mein **zentrales Portfolio-Projekt** im Bereich
-**Data & Process Analytics** mit interaktiven Dashboards auf Basis von **Streamlit**.
+Dieses Repository enthält mein **zentrales Portfolio-Projekt** im Bereich  
+**Data & Process Analytics** – umgesetzt als **interaktive Multi-Page Streamlit App**.
 
-Das Portfolio zeigt, wie ein **einheitlicher Produktionsdatensatz** aus
-verschiedenen fachlichen Perspektiven analysiert und aufbereitet werden kann.
+Das Portfolio zeigt, wie ein **einheitlicher Produktionsdatensatz**  
+aus verschiedenen fachlichen Perspektiven analysiert, strukturiert  
+und in **verständliche Ergebnisse** überführt werden kann.
 
-👉 **Live-Demo:**
-[https://daria-portfolio.streamlit.app](https://daria-portfolio.streamlit.app)
+👉 **Live-Demo:**  
+https://daria-portfolio.streamlit.app
 
 ---
 
-## Ziel des Projekts
+## 🎯 Ziel des Projekts
 
 Ziel dieses Portfolios ist es, praxisnah zu zeigen:
 
-- wie Produktions- und Prozessdaten strukturiert analysiert werden,
-- wie relevante **KPIs** abgeleitet und visualisiert werden,
-- wie typische **Business-Fragen** mit SQL-Denkweise beantwortet werden,
-- wie **Business-Logik** sauber mit objektorientierter Programmierung (OOP) gekapselt werden kann.
+- wie Produktions- und Prozessdaten strukturiert analysiert werden
+- wie relevante **KPIs** definiert, berechnet und visualisiert werden
+- wie typische **Business-Fragen** mit SQL-Denkweise beantwortet werden
+- wie **Business-Logik** sauber mit objektorientierter Programmierung (OOP) umgesetzt wird
 
-Der Fokus liegt dabei nicht auf der Datenquelle selbst, sondern auf:
-**Analyse-Logik, Datenstruktur, fachlichem Verständnis und sauberer Umsetzung.**
+Der Fokus liegt bewusst **nicht auf der Datenquelle**, sondern auf  
+**Analyse-Logik, Datenstruktur, fachlichem Verständnis und sauberer Umsetzung**.
 
 ---
 
-## Projektübersicht
+## 📂 Projektübersicht
 
-Alle Projekte basieren auf **demselben Produktionsdatensatz**, werden jedoch
-mit unterschiedlichen Methoden betrachtet.
+Alle Seiten basieren auf **demselben Produktionsdatensatz**,  
+werden jedoch mit **unterschiedlichen Analyseansätzen** betrachtet.
 
-### 1. Production KPI Dashboard (Pandas)
+### 1️⃣ Production KPI Dashboard (Pandas)
 
-- Interaktives Dashboard mit Filtern (Zeitraum, Linie, Schicht, Produkt)
-- KPI-Übersicht:
+- Interaktives Dashboard mit Filtern:
+  - Zeitraum
+  - Produktionslinie
+  - Schicht
+  - Produkt
+
+- KPI-Auswertungen:
   - Stückzahl
-  - Ausschuss & Ausschussrate
+  - Ausschuss & Ausschussquote
   - Stillstandszeiten
   - Energieverbrauch
   - Materialkosten
 
 - Zeitreihen- und Vergleichsdiagramme
-- Umsetzung mit **pandas**, **matplotlib** und optional **Plotly**
+- Umsetzung mit **Pandas**, **Matplotlib** (optional Plotly)
 
 ---
 
-### 2. SQL Data Analysis
+### 2️⃣ SQL Data Analysis
 
-- Typische Business-Fragen aus dem Produktionsumfeld
-- Darstellung der passenden **SQL-Queries**
-- Berechnung der Ergebnisse aus dem Datensatz
-- Tabellen und Visualisierungen zur Ergebnisinterpretation
+- Analyse typischer Business-Fragen aus dem Produktionsumfeld
+- Ableitung der Ergebnisse mit **SQL-Denkweise**
+- Tabellarische Auswertungen und Visualisierungen
 
 Beispielhafte Fragestellungen:
 
-- Welche Produktionslinie hat die höchste Ausschussrate?
+- Welche Produktionslinie hat die höchste Ausschussquote?
 - Welche Produkte verursachen die höchsten Materialkosten?
 - Wie entwickeln sich Output und Energieverbrauch über die Zeit?
 
 ---
 
-### 3. OOP Business Reporting
+### 3️⃣ OOP Business Reporting
 
 - Objektorientierte Strukturierung von Analyse- und Reporting-Logik
-- Kapselung von Berechnungen in Klassen (z. B. Reports, KPIs, Auswertungen)
-- Generierung strukturierter Reports:
-  - Top-Linien nach Ausschussrate
-  - teuerste Produkte
-  - auffällige Stillstände und Anomalien
+- Kapselung von Berechnungen in Klassen (z. B. KPIs, Reports, Auswertungen)
+- Generierung strukturierter Ergebnisse, z. B.:
+  - Top-Produktionslinien nach Ausschussquote
+  - kostenintensive Produkte
+  - auffällige Stillstandszeiten
 
-- Fokus auf **saubere Architektur**, nicht auf Visualisierung
+👉 Fokus auf **saubere Architektur und Business-Logik**, nicht auf Visualisierung.
 
 ---
 
-## Verwendete Technologien
+## 🛠️ Verwendete Technologien
 
 - **Python**
 - **Pandas**, **NumPy**
@@ -85,22 +90,21 @@ Beispielhafte Fragestellungen:
 
 ---
 
-## Anwendung
+## ▶️ Anwendung
 
-Das Portfolio ist als **Multi-Page Streamlit App** aufgebaut.
-
-- Navigation erfolgt über das Seitenmenü links
-- Filter und Interaktionen sind direkt in den Dashboards verfügbar
-- Alle Seiten nutzen denselben Datensatz, jedoch mit unterschiedlichen Analyseansätzen
+- Umsetzung als **Multi-Page Streamlit App**
+- Navigation über das Seitenmenü links
+- Interaktive Filter direkt in den Dashboards
+- Alle Seiten nutzen denselben Datensatz mit unterschiedlichen Analyseansätzen
 
 ---
 
-## Data Disclaimer (Wichtiger Hinweis)
+## ⚠️ Data Disclaimer
 
 Die in diesem Portfolio verwendeten Daten sind **synthetisch (KI-generiert)**.
 
-Der Datensatz wurde erstellt, um **reale industrielle Produktions- und Prozessdaten
-realistisch zu simulieren** und dient ausschließlich der Demonstration von:
+Sie simulieren realistische industrielle Produktions- und Prozessdaten  
+und dienen ausschließlich der Demonstration von:
 
 - Datenanalyse mit Pandas
 - KPI-Definition und Visualisierung
@@ -111,15 +115,15 @@ realistisch zu simulieren** und dient ausschließlich der Demonstration von:
 
 ---
 
-## Hintergrund
+## 👩‍💻 Hintergrund
 
-Dieses Projekt wurde im Rahmen meiner Umschulung und Weiterbildung im Bereich
-**IT / Data & Process Analytics** entwickelt und dient als **zentrales Portfolio**
-für Bewerbungen und fachliche Gespräche.
+Dieses Projekt entstand im Rahmen meiner Umschulung und Weiterbildung  
+im Bereich **IT / Data & Process Analytics**  
+und dient als **zentrales Portfolio** für Bewerbungen und Fachgespräche.
 
 ---
 
-## Links
+## 🔗 Links
 
-- **GitHub Profil:** [https://github.com/DariaWagner](https://github.com/DariaWagner)
-- **Live Portfolio (Streamlit):** [https://daria-portfolio.streamlit.app](https://daria-portfolio.streamlit.app)
+- **GitHub Profil:** https://github.com/DariaWagner
+- **Live Portfolio (Streamlit):** https://daria-portfolio.streamlit.app
