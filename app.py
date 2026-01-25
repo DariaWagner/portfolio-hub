@@ -1,45 +1,37 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="Portfolio | Data & Process Analytics",
+    page_title="Data & Process Analytics Portfolio",
     page_icon="📊",
     layout="wide"
 )
 
-st.title("📌 Mein Portfolio (Live-Demos)")
-st.write(
-    "Hier finden Sie meine Projekte aus Python, SQL und Data Analytics – "
-    "inklusive Visualisierungen und kurzer fachlicher Zusammenfassung."
-)
+st.title("📊 Data & Process Analytics – Portfolio")
 
-st.markdown("### 🔎 Was Sie hier sehen")
-cols = st.columns(3)
-with cols[0]:
-    st.info("🧩 **Python/OOP**\n\nBestellverwaltung (OOP, Struktur, Tests/Logik)")
-with cols[1]:
-    st.info("🗄️ **SQL**\n\nAnalysen mit SQL + Business-Fragen + KPIs")
-with cols[2]:
-    st.info("📈 **Pandas & KPIs**\n\nDatenbereinigung, KPI-Berechnung, Charts")
+st.write(
+    "Willkommen in meinem Portfolio. "
+    "Hier sehen Sie praxisnahe Analysen auf Basis eines konsistenten Produktionsdatensatzes "
+    "– umgesetzt mit **Pandas**, **SQL-Denkweise** und **OOP-Struktur**."
+)
 
 st.markdown("---")
-st.markdown("### 👩‍💻 Über mich (kurz)")
-st.write(
-    "Ich befinde mich in einer Umschulung im Bereich **IT Data & Process Analytics** "
-    "und baue praxisnahe Projekte mit Fokus auf Datenanalyse, Struktur und Reporting."
-)
 
-st.markdown("➡️ **Links:**")
-st.write("- GitHub: (kommt rein)")
-st.write("- LinkedIn: (kommt rein)")
-st.write("- CV (PDF): (optional)")
+# ---- Quick Overview Cards ----
+c1, c2, c3 = st.columns(3)
 
+with c1:
+    st.subheader("🐼 Pandas KPI Dashboard")
+    st.write(
+        "- KPIs & Filter\n"
+        "- Zeitreihen & Vergleich\n"
+        "- Produktions-, Kosten- & Energiedaten"
+    )
+    st.markdown("➡️ *Seite: Production KPIs (Pandas)*")
 
-import streamlit as st
-
-st.set_page_config(
-    page_title="Portfolio Hub",
-    layout="wide"
-)
-
-st.title("📊 Portfolio Hub")
-st.write("Startseite funktioniert ✅")
+with c2:
+    st.subheader("🗄️ SQL Data Analysis")
+    st.write(
+        "- Business-Fragen\n"
+        "- SQL-Queries\n"
+        "- Ergebnis + Visualisierung"
+    )

@@ -1,1 +1,60 @@
+# ------------------------------
+# Python
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# ------------------------------
+# Virtual Environments
+# ------------------------------
+.venv/
+venv/
+env/
+
+# ------------------------------
+# Jupyter / IPython
+# ------------------------------
+.ipynb_checkpoints/
+
+# ------------------------------
+# IDEs / Editors
+# ------------------------------
 .idea/
+.vscode/
+*.iml
+
+# ------------------------------
+# OS files
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Streamlit
+# ------------------------------
+.streamlit/secrets.toml
+
+# ------------------------------
+# Logs & temp files
+# ------------------------------
+*.log
+*.tmp
+
+# ------------------------------
+# Data (keep only intended CSVs)
+# ------------------------------
+# ⚠️ IMPORTANT:
+# We keep production CSVs explicitly in repo.
+# Do NOT ignore /data/ completely.
+# ------------------------------
+
+# Example: ignore local test files if any
+data/*_local.csv
+data/*_test.csv

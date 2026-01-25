@@ -2,107 +2,197 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from services.data_loader import load_data
+
+# Optional: Plotly (interaktiv)
+try:
+    import plotly.express as px
+    HAS_PLOTLY = True
+except Exception:
+    HAS_PLOTLY = False
+
+st.set_page_config(page_title="Produktions-KPIs (Pandas)", layout="wide")
+
 st.title("📈 Produktionsprozess-KPIs (Pandas)")
+st.write("Interaktives KPI-Dashboard auf Basis des Produktionsdatensatzes.")
 
-st.write("Interaktives KPI-Dashboard mit Filter, KPIs, Tabelle und Charts.")
+with st.expander("📥 Optional: CSV hochladen (überschreibt Repo-Datei)", expanded=False):
+    uploaded = st.file_uploader("CSV auswählen", type=["csv"])
+df = load_data(uploaded_file=uploaded)
 
-# --- 1) Datenquelle: Upload oder Demo ---
-uploaded = st.file_uploader("CSV hochladen (optional)", type=["csv"])
+# --- Basic checks ---
+required = ["Datum", "Produktionslinie", "Stueckzahl", "Ausschuss", "Stillstandszeit_Min", "Energieverbrauch_kWh", "Materialkosten", "Produkt", "Schicht"]
+missing = [c for c in required if c not in df.columns]
+if missing:
+    st.error(f"Es fehlen Spalten für das Dashboard: {missing}")
+    st.stop()
 
-@st.cache_data
-def load_demo():
-    # kleine Demo-Daten (HR kann sofort sehen, dass es „echt“ ist)
-    return pd.DataFrame({
-        "Datum": pd.date_range("2025-01-01", periods=180, freq="D"),
-        "Linie": (["A"]*60) + (["B"]*60) + (["C"]*60),
-        "Output": ([520]*60) + ([480]*60) + ([510]*60),
-        "Ausschuss": ([12]*60) + ([18]*60) + ([10]*60),
-        "Stillstand_min": ([35]*60) + ([55]*60) + ([28]*60),
-        "Temp": ([72]*60) + ([75]*60) + ([71]*60),
-    })
+df = df.dropna(subset=["Datum"])
 
-@st.cache_data
-def load_csv(file) -> pd.DataFrame:
-    df = pd.read_csv(file)
-    # Versuch, Datum zu finden/konvertieren
-    for col in ["Datum", "date", "Date", "timestamp", "Timestamp"]:
-        if col in df.columns:
-            df[col] = pd.to_datetime(df[col], errors="coerce")
-            df = df.rename(columns={col: "Datum"})
-            break
-    return df
+# --- Controls ---
+colA, colB, colC, colD = st.columns([2, 2, 2, 2])
 
-df = load_csv(uploaded) if uploaded is not None else load_demo()
+min_d, max_d = df["Datum"].min(), df["Datum"].max()
 
-# --- 2) Minimaler „Datencheck“ ---
-st.caption(f"Zeilen: {len(df):,} | Spalten: {len(df.columns)}")
-with st.expander("Spalten anzeigen"):
-    st.write(list(df.columns))
+with colA:
+    start_end = st.date_input("Zeitraum", (min_d.date(), max_d.date()))
+    if isinstance(start_end, tuple) and len(start_end) == 2:
+        start, end = start_end
+    else:
+        start, end = min_d.date(), max_d.date()
 
-# --- 3) Filter ---
-if "Datum" in df.columns:
-    df = df.dropna(subset=["Datum"])
-    min_d, max_d = df["Datum"].min(), df["Datum"].max()
-    start, end = st.date_input("Zeitraum", (min_d.date(), max_d.date()))
-    df = df[(df["Datum"] >= pd.to_datetime(start)) & (df["Datum"] <= pd.to_datetime(end))]
+with colB:
+    linien = sorted(df["Produktionslinie"].dropna().unique().tolist())
+    sel_linien = st.multiselect("Produktionslinie", linien, default=linien)
 
-if "Linie" in df.columns:
-    lines = sorted(df["Linie"].dropna().unique().tolist())
-    sel = st.multiselect("Linie", lines, default=lines)
-    df = df[df["Linie"].isin(sel)]
+with colC:
+    schichten = sorted(df["Schicht"].dropna().unique().tolist())
+    sel_schichten = st.multiselect("Schicht", schichten, default=schichten)
 
-# --- 4) KPIs ---
-def safe_div(a, b):
-    return float(a) / float(b) if b else 0.0
+with colD:
+    products = sorted(df["Produkt"].dropna().unique().tolist())
+    sel_products = st.multiselect("Produkt", products, default=products[: min(len(products), 10)] if len(products) > 10 else products)
 
-total_output = df["Output"].sum() if "Output" in df.columns else 0
-total_scrap = df["Ausschuss"].sum() if "Ausschuss" in df.columns else 0
-scrap_rate = safe_div(total_scrap, total_output) if total_output else 0
-downtime = df["Stillstand_min"].sum() if "Stillstand_min" in df.columns else 0
+use_plotly = False
+if HAS_PLOTLY:
+    use_plotly = st.toggle("Interaktiv (Plotly)", value=False)
+else:
+    st.caption("Plotly nicht installiert → es wird matplotlib verwendet.")
 
-c1, c2, c3, c4 = st.columns(4)
-c1.metric("Output (Summe)", f"{total_output:,.0f}")
-c2.metric("Ausschuss (Summe)", f"{total_scrap:,.0f}")
-c3.metric("Ausschussrate", f"{scrap_rate*100:.2f}%")
-c4.metric("Stillstand (min)", f"{downtime:,.0f}")
+# --- Filter data ---
+df_f = df[
+    (df["Datum"] >= pd.to_datetime(start)) &
+    (df["Datum"] <= pd.to_datetime(end)) &
+    (df["Produktionslinie"].isin(sel_linien)) &
+    (df["Schicht"].isin(sel_schichten)) &
+    (df["Produkt"].isin(sel_products))
+].copy()
+
+if df_f.empty:
+    st.warning("Keine Daten für die gewählten Filter. Bitte Filter anpassen.")
+    st.stop()
+
+# --- KPIs ---
+total_units = float(df_f["Stueckzahl"].sum())
+total_scrap = float(df_f["Ausschuss"].sum())
+scrap_rate = (total_scrap / total_units) if total_units else 0.0
+total_downtime = float(df_f["Stillstandszeit_Min"].sum())
+total_energy = float(df_f["Energieverbrauch_kWh"].sum())
+total_material = float(df_f["Materialkosten"].sum())
+
+k1, k2, k3, k4, k5, k6 = st.columns(6)
+k1.metric("Stückzahl", f"{total_units:,.0f}")
+k2.metric("Ausschuss", f"{total_scrap:,.0f}")
+k3.metric("Ausschussrate", f"{scrap_rate*100:.2f}%")
+k4.metric("Stillstand (Min)", f"{total_downtime:,.0f}")
+k5.metric("Energie (kWh)", f"{total_energy:,.0f}")
+k6.metric("Materialkosten (€)", f"{total_material:,.0f}")
 
 st.markdown("---")
 
-# --- 5) Tabelle ---
-st.subheader("📋 Daten (Ausschnitt)")
-st.dataframe(df.head(200), use_container_width=True)
+# --- Tables ---
+left, right = st.columns([2, 1])
 
-# --- 6) Charts ---
-st.subheader("📊 Visuals")
+with left:
+    st.subheader("📋 Daten (Ausschnitt)")
+    st.dataframe(df_f.sort_values("Datum", ascending=False).head(500), use_container_width=True)
 
-# Chart 1: Ausschussrate über Zeit (täglich aggregiert)
-if "Datum" in df.columns and "Ausschuss" in df.columns and "Output" in df.columns:
-    daily = df.groupby(df["Datum"].dt.date).agg({"Ausschuss":"sum","Output":"sum"}).reset_index()
-    daily["Ausschussrate"] = daily["Ausschuss"] / daily["Output"].replace(0, pd.NA)
+with right:
+    st.subheader("🔎 Quick Insights")
+    # Top line by scrap rate
+    by_line = df_f.groupby("Produktionslinie").agg(
+        stueck=("Stueckzahl", "sum"),
+        ausschuss=("Ausschuss", "sum"),
+        stillstand=("Stillstandszeit_Min", "sum"),
+        energie=("Energieverbrauch_kWh", "sum"),
+        material=("Materialkosten", "sum")
+    )
+    by_line["ausschussrate"] = by_line["ausschuss"] / by_line["stueck"].replace(0, pd.NA)
+    top_bad = by_line.sort_values("ausschussrate", ascending=False).head(5)
+    st.write("**Top 5 Linien nach Ausschussrate**")
+    st.dataframe(top_bad[["ausschussrate", "stueck", "ausschuss", "stillstand"]], use_container_width=True)
 
+st.markdown("---")
+
+# --- Charts ---
+st.subheader("📊 Visualisierung")
+
+# 1) Monthly trend: scrap rate + units
+monthly = df_f.copy()
+monthly["Monat"] = monthly["Datum"].dt.to_period("M").dt.to_timestamp()
+m = monthly.groupby("Monat").agg(
+    stueck=("Stueckzahl", "sum"),
+    ausschuss=("Ausschuss", "sum"),
+    stillstand=("Stillstandszeit_Min", "sum"),
+    energie=("Energieverbrauch_kWh", "sum"),
+    material=("Materialkosten", "sum")
+).reset_index()
+m["Ausschussrate_%"] = (m["ausschuss"] / m["stueck"].replace(0, pd.NA)) * 100
+
+c1, c2 = st.columns(2)
+
+with c1:
+    st.write("**Ausschussrate (%) über Zeit (Monat)**")
+    if use_plotly:
+        fig = px.line(m, x="Monat", y="Ausschussrate_%")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        fig = plt.figure()
+        plt.plot(m["Monat"], m["Ausschussrate_%"])
+        plt.xlabel("Monat")
+        plt.ylabel("Ausschussrate (%)")
+        st.pyplot(fig)
+
+with c2:
+    st.write("**Stückzahl über Zeit (Monat)**")
+    if use_plotly:
+        fig = px.line(m, x="Monat", y="stueck")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        fig = plt.figure()
+        plt.plot(m["Monat"], m["stueck"])
+        plt.xlabel("Monat")
+        plt.ylabel("Stückzahl")
+        st.pyplot(fig)
+
+# 2) Units by line
+st.write("**Stückzahl nach Produktionslinie**")
+line_units = df_f.groupby("Produktionslinie")["Stueckzahl"].sum().sort_values(ascending=False).reset_index()
+if use_plotly:
+    fig = px.bar(line_units, x="Produktionslinie", y="Stueckzahl")
+    st.plotly_chart(fig, use_container_width=True)
+else:
     fig = plt.figure()
-    plt.plot(daily["Datum"], daily["Ausschussrate"] * 100)
-    plt.xlabel("Datum")
-    plt.ylabel("Ausschussrate (%)")
+    plt.bar(line_units["Produktionslinie"].astype(str), line_units["Stueckzahl"].values)
+    plt.xticks(rotation=30, ha="right")
+    plt.ylabel("Stückzahl")
+    plt.xlabel("Produktionslinie")
     st.pyplot(fig)
 
-# Chart 2: Output nach Linie (Balken)
-if "Linie" in df.columns and "Output" in df.columns:
-    by_line = df.groupby("Linie")["Output"].sum().sort_values(ascending=False)
-    fig2 = plt.figure()
-    plt.bar(by_line.index.astype(str), by_line.values)
-    plt.xlabel("Linie")
-    plt.ylabel("Output (Summe)")
-    st.pyplot(fig2)
+# 3) Energy by product (Top 10)
+st.write("**Energieverbrauch nach Produkt (Top 10)**")
+prod_energy = df_f.groupby("Produkt")["Energieverbrauch_kWh"].sum().sort_values(ascending=False).head(10).reset_index()
+if use_plotly:
+    fig = px.bar(prod_energy, x="Produkt", y="Energieverbrauch_kWh")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    fig = plt.figure()
+    plt.bar(prod_energy["Produkt"].astype(str), prod_energy["Energieverbrauch_kWh"].values)
+    plt.xticks(rotation=30, ha="right")
+    plt.ylabel("Energie (kWh)")
+    plt.xlabel("Produkt")
+    st.pyplot(fig)
 
-# Chart 3: Stillstand nach Linie (Balken)
-if "Linie" in df.columns and "Stillstand_min" in df.columns:
-    dt_line = df.groupby("Linie")["Stillstand_min"].sum().sort_values(ascending=False)
-    fig3 = plt.figure()
-    plt.bar(dt_line.index.astype(str), dt_line.values)
-    plt.xlabel("Linie")
-    plt.ylabel("Stillstand (min)")
-    st.pyplot(fig3)
-
-st.markdown("### 🔗 Repo")
-st.markdown("[➡️ data-cleaning-analysis-pandas-visualization ansehen](https://github.com/DariaWagner/data-cleaning-analysis-pandas-visualization)")
+# 4) Downtime by line
+st.write("**Stillstandszeit nach Produktionslinie**")
+line_dt = df_f.groupby("Produktionslinie")["Stillstandszeit_Min"].sum().sort_values(ascending=False).reset_index()
+if use_plotly:
+    fig = px.bar(line_dt, x="Produktionslinie", y="Stillstandszeit_Min")
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    fig = plt.figure()
+    plt.bar(line_dt["Produktionslinie"].astype(str), line_dt["Stillstandszeit_Min"].values)
+    plt.xticks(rotation=30, ha="right")
+    plt.ylabel("Stillstandszeit (Min)")
+    plt.xlabel("Produktionslinie")
+    st.pyplot(fig)
