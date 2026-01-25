@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 from services.data_loader import load_production_data
 
+df = load_production_data()
+
 # --------------------------------------------------
 # Page config
 # --------------------------------------------------

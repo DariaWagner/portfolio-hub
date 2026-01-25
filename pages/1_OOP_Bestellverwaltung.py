@@ -1,7 +1,7 @@
 import streamlit as st
 
 # --------------------------------------------------
-# Page Config
+# Page config (NUR 1x und ganz am Anfang!)
 # --------------------------------------------------
 st.set_page_config(
     page_title="OOP Bestellverwaltung",
@@ -32,7 +32,7 @@ st.write(
     """
     Entwicklung einer kleinen Bestellverwaltung als OOP-Projekt
     mit Fokus auf:
-    
+
     - saubere Klassenstruktur
     - klare Verantwortlichkeiten
     - nachvollziehbare Geschäftslogik
@@ -44,11 +44,7 @@ st.write(
 # --------------------------------------------------
 st.header("Klassen & Modell")
 
-st.write(
-    """
-    Das Projekt besteht aus mehreren logisch getrennten Klassen:
-    """
-)
+st.write("Das Projekt besteht aus mehreren logisch getrennten Klassen:")
 
 st.markdown(
     """
@@ -79,10 +75,7 @@ st.markdown(
 # --------------------------------------------------
 st.header("Technischer Stack")
 
-st.code(
-    "Python | OOP | Git | GitHub",
-    language="text"
-)
+st.code("Python | OOP | Git | GitHub", language="text")
 
 # --------------------------------------------------
 # Repo Link

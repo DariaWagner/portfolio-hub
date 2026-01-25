@@ -3,6 +3,8 @@ import pandas as pd
 
 from services.data_loader import load_production_data
 
+df = load_production_data()
+
 st.set_page_config(page_title="SQL Data Analysis", layout="wide")
 
 st.title("SQL Data Analysis")
