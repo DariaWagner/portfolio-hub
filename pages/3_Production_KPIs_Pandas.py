@@ -189,82 +189,87 @@ st.divider()
 # --------------------------------------------------
 st.header("Maschinennutzung und Stillstand nach Schicht")
 
-# Sum downtime per shift
+# Annahme: 1 Schicht = 8 Stunden
+SHIFT_HOURS = 8
+
 kpi_shift = (
     df_f.groupby("Schicht", dropna=False)
     .agg(
         Stillstand_Min=("Stillstandszeit_Min", "sum"),
-        Gesamtstückzahl=("Stueckzahl", "sum"),
-        Gesamtausschuss=("Ausschuss", "sum"),
-        Betriebsstunden_sum=("Betriebsstunden", "sum") if "Betriebsstunden" in df_f.columns else ("Stueckzahl", "count"),
-        Records=("Stueckzahl", "count"),
+        Datensaetze=("Stillstandszeit_Min", "count")
     )
     .reset_index()
 )
 
-# Runtime minutes:
-# 1) If Betriebsstunden exists and is meaningful -> use it
-# 2) else assume each record ~ one shift of shift_hours
-if "Betriebsstunden" in df_f.columns and df_f["Betriebsstunden"].notna().any():
-    runtime_min = (kpi_shift["Betriebsstunden_sum"].fillna(0) * 60.0)
-else:
-    available_min = kpi_shift["Records"].fillna(0) * float(shift_hours) * 60.0
-    runtime_min = (available_min - kpi_shift["Stillstand_Min"].fillna(0)).clip(lower=0)
+# Gesamtzeit in Minuten
+kpi_shift["Gesamtzeit_Min"] = kpi_shift["Datensaetze"] * SHIFT_HOURS * 60
 
-total_min = (runtime_min + kpi_shift["Stillstand_Min"].fillna(0)).replace(0, np.nan)
+# Prozentwerte (sauber & logisch)
+kpi_shift["Stillstand_%"] = (
+    kpi_shift["Stillstand_Min"] / kpi_shift["Gesamtzeit_Min"] * 100
+).round(1)
 
-kpi_shift["Stillstand_%"] = (kpi_shift["Stillstand_Min"].fillna(0) / total_min * 100.0).fillna(0).round(1)
-kpi_shift["Nutzung_%"] = (runtime_min / total_min * 100.0).fillna(0).round(1)
-
-# Scrap (optional)
-kpi_shift["Ausschussquote (%)"] = (
-    kpi_shift["Gesamtausschuss"] / kpi_shift["Gesamtstückzahl"].replace(0, np.nan) * 100.0
-).fillna(0).round(2)
+kpi_shift["Nutzung_%"] = (100 - kpi_shift["Stillstand_%"]).round(1)
 
 st.dataframe(
-    kpi_shift[["Schicht", "Nutzung_%", "Stillstand_%", "Ausschussquote (%)"]]
-    .sort_values("Stillstand_%", ascending=False),
-    use_container_width=True,
+    kpi_shift[["Schicht", "Nutzung_%", "Stillstand_%"]],
+    use_container_width=True
 )
 
-# Plot 100% stacked
-labels = kpi_shift["Schicht"].astype(str).tolist()
-nutzung = kpi_shift["Nutzung_%"].to_numpy()
-stillstand = kpi_shift["Stillstand_%"].to_numpy()
+# ---------------- Diagramm ----------------
+fig, ax = plt.subplots(figsize=(6, 3))  # klein & ruhig
 
-x = np.arange(len(labels))
+x = np.arange(len(kpi_shift))
+bar_width = 0.35
 
-fig, ax = plt.subplots(figsize=FIG_MED)
+# Nutzung (grün, unten)
+ax.bar(
+    x,
+    kpi_shift["Nutzung_%"],
+    width=bar_width,
+    color="#2ca02c",
+    label="Nutzung (%)"
+)
 
-# grün unten, rot oben
-ax.bar(x, nutzung, width=BAR_WIDTH, color="green", label="Nutzung (%)")
-ax.bar(x, stillstand, bottom=nutzung, width=BAR_WIDTH, color="red", label="Stillstand (%)")
+# Stillstand (rot, oben)
+ax.bar(
+    x,
+    kpi_shift["Stillstand_%"],
+    bottom=kpi_shift["Nutzung_%"],
+    width=bar_width,
+    color="#d62728",
+    label="Stillstand (%)"
+)
 
+# Achsen & Gitter
 ax.set_ylim(0, 100)
 ax.set_yticks([0, 25, 50, 75, 100])
 ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"])
 ax.set_ylabel("Anteil (%)")
-ax.set_xlabel("Schicht")
+
 ax.set_xticks(x)
-ax.set_xticklabels(labels)
+ax.set_xticklabels(kpi_shift["Schicht"])
+ax.set_xlabel("Schicht")
 
-ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
+ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-# Legend oben, ohne alles zu überdecken
-ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.12), ncol=2, frameon=False)
+# Beschriftung UNTER dem Balken
+for i, row in kpi_shift.iterrows():
+    ax.text(
+        i,
+        -8,
+        f"Nutzung {row['Nutzung_%']} %\nStillstand {row['Stillstand_%']} %",
+        ha="center",
+        va="top",
+        fontsize=9
+    )
 
-# Beschriftung: untereinander, UNTER dem Balken (nicht im Balken)
-# 2 Zeilen: Nutzung + Stillstand
-for i, (n, s) in enumerate(zip(nutzung, stillstand)):
-    ax.text(i, -6.0, f"N {n:.1f}%", ha="center", va="top", fontsize=9, clip_on=False)
-    ax.text(i, -11.0, f"S {s:.1f}%", ha="center", va="top", fontsize=9, clip_on=False)
-
-# Platz für Legend + Text unten
+ax.legend(loc="upper center", ncol=2, frameon=False)
 plt.tight_layout()
-plt.subplots_adjust(bottom=0.28, top=0.85)
-
 st.pyplot(fig)
+
 st.divider()
+
 
 # --------------------------------------------------
 # Chart 3: Trend over time (monthly)
