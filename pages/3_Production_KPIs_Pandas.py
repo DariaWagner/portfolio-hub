@@ -275,7 +275,8 @@ ax.bar(
 ax.set_ylabel("Anteil (%)")
 ax.set_xlabel("Schicht")
 ax.set_ylim(0, 100)
-ax.set_yticks(np.arange(0, 101, 10))
+ax.set_yticks([0, 25, 50, 75, 100])
+ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"])
 ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 ax.legend(loc="upper center", ncol=2, frameon=False)
 
