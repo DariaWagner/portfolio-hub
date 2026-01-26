@@ -222,6 +222,11 @@ fig, ax = plt.subplots(figsize=(6, 3))  # klein & ruhig
 x = np.arange(len(kpi_shift))
 bar_width = 0.35
 
+fig, ax = plt.subplots(figsize=(6, 3))  # klein & ruhig
+
+x = np.arange(len(kpi_shift))
+bar_width = 0.35
+
 # Nutzung (grün, unten)
 ax.bar(
     x,
@@ -240,6 +245,32 @@ ax.bar(
     color="#d62728",
     label="Stillstand (%)"
 )
+
+# Beschriftung ÜBER dem Balken (weißes Feld)
+for i, row in kpi_shift.iterrows():
+    ax.text(
+        x[i],
+        102,
+        f"Nutzung {row['Nutzung_%']:.1f}%\nStillstand {row['Stillstand_%']:.1f}%",
+        ha="center",
+        va="bottom",
+        fontsize=9
+    )
+
+# Achsen & Gitter
+ax.set_xticks(x)
+ax.set_xticklabels(kpi_shift["Schicht"])
+ax.set_ylabel("Anteil (%)")
+ax.set_xlabel("Schicht")
+ax.set_ylim(0, 110)
+ax.set_yticks([0, 25, 50, 75, 100])
+ax.set_yticklabels(["0%", "25%", "50%", "75%", "100%"])
+ax.legend(loc="upper center", ncol=2)
+ax.grid(axis="y", linestyle="--", alpha=0.4)
+
+plt.tight_layout()
+st.pyplot(fig)
+
 
 # Achsen & Gitter
 ax.set_ylim(0, 100)
@@ -261,7 +292,7 @@ for i, row in kpi_shift.iterrows():
         f"Nutzung {row['Nutzung_%']} %\nStillstand {row['Stillstand_%']} %",
         ha="center",
         va="top",
-        fontsize=15
+        fontsize=7
     )
 
 ax.legend(loc="upper center", ncol=2, frameon=False)
