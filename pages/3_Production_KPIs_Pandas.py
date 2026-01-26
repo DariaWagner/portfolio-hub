@@ -257,11 +257,11 @@ ax.grid(axis="y", linestyle="--", alpha=0.4)
 for i, row in kpi_shift.iterrows():
     ax.text(
         i,
-        -12,
+        -25,
         f"Nutzung {row['Nutzung_%']} %\nStillstand {row['Stillstand_%']} %",
         ha="center",
         va="top",
-        fontsize=9
+        fontsize=15
     )
 
 ax.legend(loc="upper center", ncol=2, frameon=False)
