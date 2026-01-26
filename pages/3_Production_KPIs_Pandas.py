@@ -7,9 +7,11 @@ if str(ROOT_DIR) not in sys.path:
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 from services.data_loader import load_production_data
+
 
 df = load_production_data()
 
