@@ -9,16 +9,23 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 from services.data_loader import load_production_data
 
 
-df = load_production_data()
-
 # --------------------------------------------------
-# Page config
+# Page config (MUSS ganz oben vor allen st.* Calls stehen!)
 # --------------------------------------------------
 st.set_page_config(page_title="Production KPIs with Pandas", layout="wide")
+
+# --------------------------------------------------
+# Plot settings (einheitlich)
+# --------------------------------------------------
+FIG_WIDE = (10, 4)
+FIG_TREND = (12, 4)
+BAR_WIDTH = 0.45
+GRID_ALPHA = 0.30
 
 st.title("Production KPIs – Pandas Analysis")
 
@@ -61,8 +68,16 @@ for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
 required_cols = [
-    "Datum", "Produktionslinie", "Schicht", "Produkt", "Modifikation",
-    "Stueckzahl", "Ausschuss", "Stillstandszeit_Min", "Energieverbrauch_kWh", "Materialkosten"
+    "Datum",
+    "Produktionslinie",
+    "Schicht",
+    "Produkt",
+    "Modifikation",
+    "Stueckzahl",
+    "Ausschuss",
+    "Stillstandszeit_Min",
+    "Energieverbrauch_kWh",
+    "Materialkosten",
 ]
 missing = [c for c in required_cols if c not in df.columns]
 if missing:
@@ -94,14 +109,13 @@ selected_shifts = st.sidebar.multiselect("Schicht", options=shifts, default=shif
 # Apply filters
 start_date, end_date = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
 df_f = df[
-    (df["Datum"] >= start_date) &
-    (df["Datum"] <= end_date) &
-    (df["Produktionslinie"].isin(selected_lines)) &
-    (df["Schicht"].isin(selected_shifts))
+    (df["Datum"] >= start_date)
+    & (df["Datum"] <= end_date)
+    & (df["Produktionslinie"].isin(selected_lines))
+    & (df["Schicht"].isin(selected_shifts))
 ].copy()
 
 st.header("Datenüberblick")
-
 st.write("Auszug der gefilterten Daten:")
 st.dataframe(df_f.head(50), use_container_width=True)
 
@@ -112,28 +126,54 @@ st.divider()
 # --------------------------------------------------
 st.header("Gesamtkennzahlen")
 
-total_output = df_f["Stueckzahl"].sum()
-total_scrap = df_f["Ausschuss"].sum()
+total_output = float(df_f["Stueckzahl"].sum())
+total_scrap = float(df_f["Ausschuss"].sum())
+
+total_downtime_min = float(df_f["Stillstandszeit_Min"].sum())
+total_downtime_h = total_downtime_min / 60.0
+
+# Maschinen-Nutzungslogik:
+# Wir nehmen "Betriebsstunden" wenn vorhanden, sonst approximieren wir verfügbare Zeit aus Zeitraum.
+has_operating_hours = "Betriebsstunden" in df_f.columns and df_f["Betriebsstunden"].notna().any()
+
+if has_operating_hours:
+    operating_h = float(df_f["Betriebsstunden"].fillna(0).sum())
+    planned_h = operating_h + total_downtime_h
+else:
+    # Fallback: geplante Zeit = Tage im Zeitraum * 24h * Anzahl ausgewählter Linien (sehr grobe Annäherung)
+    days = max(1, (end_date.date() - start_date.date()).days + 1)
+    planned_h = float(days * 24 * max(1, len(selected_lines)))
+    operating_h = max(0.0, planned_h - total_downtime_h)
+
+utilization_pct = (operating_h / planned_h * 100) if planned_h > 0 else 0.0
+downtime_share_pct = (total_downtime_h / planned_h * 100) if planned_h > 0 else 0.0
 
 kpi_total = pd.DataFrame(
     {
-        "Gesamtstückzahl": [total_output],
-        "Gesamtausschuss": [total_scrap],
+        "Gesamtstückzahl": [round(total_output, 0)],
+        "Gesamtausschuss": [round(total_scrap, 0)],
         "Ausschussquote (%)": [round((total_scrap / total_output * 100) if total_output else 0.0, 2)],
-        "Gesamtstillstand (Min)": [df_f["Stillstandszeit_Min"].sum()],
-        "Gesamtenergie (kWh)": [df_f["Energieverbrauch_kWh"].sum()],
-        "Gesamtkosten Material": [df_f["Materialkosten"].sum()],
+        "Stillstand (h)": [round(total_downtime_h, 2)],
+        "Stillstand-Anteil (%)": [round(downtime_share_pct, 2)],
+        "Maschinen-Nutzung (%)": [round(utilization_pct, 2)],
+        "Gesamtenergie (kWh)": [round(float(df_f["Energieverbrauch_kWh"].sum()), 2)],
+        "Gesamtkosten Material": [round(float(df_f["Materialkosten"].sum()), 2)],
     }
 )
 
 st.dataframe(kpi_total, use_container_width=True)
+
+if not has_operating_hours:
+    st.info(
+        "Hinweis: 'Maschinen-Nutzung (%)' wird hier grob aus Zeitraum*24h*Linien approximiert, "
+        "weil keine Spalte 'Betriebsstunden' vorhanden/gefüllt ist."
+    )
 
 st.divider()
 
 # --------------------------------------------------
 # Chart 1: Scrap rate by line
 # --------------------------------------------------
-
 st.header("Ausschussquote nach Produktionslinie")
 
 kpi_line = (
@@ -141,89 +181,102 @@ kpi_line = (
     .agg(
         Gesamtstückzahl=("Stueckzahl", "sum"),
         Gesamtausschuss=("Ausschuss", "sum"),
+        Stillstand_Min=("Stillstandszeit_Min", "sum"),
+        Energie_kWh=("Energieverbrauch_kWh", "sum"),
+        Materialkosten=("Materialkosten", "sum"),
     )
     .reset_index()
 )
 
 kpi_line["Ausschussquote (%)"] = (
-    kpi_line["Gesamtausschuss"]
-    / kpi_line["Gesamtstückzahl"].replace(0, np.nan)
-    * 100
+    kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"].replace(0, np.nan) * 100
 ).fillna(0).round(2)
 
 st.dataframe(kpi_line.sort_values("Ausschussquote (%)", ascending=False), use_container_width=True)
+
+# Dynamische Y-Achse: rund um die Werte, aber max 0–6 wenn sinnvoll
+min_y = max(0.0, float(kpi_line["Ausschussquote (%)"].min()) - 0.3)
+max_y = float(kpi_line["Ausschussquote (%)"].max()) + 0.3
+min_y = np.floor(min_y * 10) / 10
+max_y = np.ceil(max_y * 10) / 10
 
 fig, ax = plt.subplots(figsize=FIG_WIDE)
 ax.bar(
     kpi_line["Produktionslinie"].astype(str),
     kpi_line["Ausschussquote (%)"],
-    width=BAR_WIDTH
+    width=BAR_WIDTH,
 )
 
-ax.set_ylim(4, 6)
-ax.set_yticks(np.arange(4, 6.1, 0.1))
+ax.set_ylim(min_y, max_y)
+ax.yaxis.set_major_locator(MultipleLocator(0.1))
+ax.yaxis.set_major_formatter(FormatStrFormatter("%.1f"))
 ax.set_ylabel("Ausschussquote (%)")
 ax.set_xlabel("Produktionslinie")
 ax.tick_params(axis="x", rotation=45)
-ax.grid(axis="y", linestyle="--", alpha=0.4)
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 
 plt.tight_layout()
 st.pyplot(fig)
 
 st.divider()
 
-
 # --------------------------------------------------
-# Chart 2: Downtime by shift
+# Chart 2: Downtime + Utilization by shift (Anteile in %)
 # --------------------------------------------------
-st.header("Stillstandszeit nach Schicht")
+st.header("Stillstand & Maschinen-Nutzung nach Schicht")
 
-# KPI-Berechnung
 kpi_shift = (
     df_f.groupby("Schicht", dropna=False)
     .agg(
         Stillstand_Min=("Stillstandszeit_Min", "sum"),
         Gesamtstückzahl=("Stueckzahl", "sum"),
         Gesamtausschuss=("Ausschuss", "sum"),
+        Betriebsstunden=("Betriebsstunden", "sum") if "Betriebsstunden" in df_f.columns else ("Stillstandszeit_Min", "size"),
     )
     .reset_index()
 )
 
-# Stillstand von Minuten → Stunden umrechnen
-kpi_shift["Stillstand_Std"] = (kpi_shift["Stillstand_Min"] / 60).round(2)
+# Minuten -> Stunden
+kpi_shift["Stillstand_h"] = (kpi_shift["Stillstand_Min"] / 60).fillna(0)
 
-# Ausschussquote (optional, für Tabelle)
+# Nutzungsanteil: wenn Betriebsstunden da sind -> Anteil bezogen auf (Betriebsstunden + Stillstand)
+if "Betriebsstunden" in df_f.columns:
+    kpi_shift["Betriebs_h"] = pd.to_numeric(kpi_shift["Betriebsstunden"], errors="coerce").fillna(0)
+    kpi_shift["Geplant_h"] = (kpi_shift["Betriebs_h"] + kpi_shift["Stillstand_h"]).replace(0, np.nan)
+    kpi_shift["Stillstand_Anteil_%"] = (kpi_shift["Stillstand_h"] / kpi_shift["Geplant_h"] * 100).fillna(0).round(2)
+    kpi_shift["Nutzung_%"] = (kpi_shift["Betriebs_h"] / kpi_shift["Geplant_h"] * 100).fillna(0).round(2)
+else:
+    # Fallback: pro Schicht geplante Zeit approximieren: Zeitraum*8h*Linien
+    days = max(1, (end_date.date() - start_date.date()).days + 1)
+    planned_h_shift = float(days * 8 * max(1, len(selected_lines)))
+    kpi_shift["Geplant_h"] = planned_h_shift
+    kpi_shift["Stillstand_Anteil_%"] = (kpi_shift["Stillstand_h"] / planned_h_shift * 100).fillna(0).round(2)
+    kpi_shift["Nutzung_%"] = (100 - kpi_shift["Stillstand_Anteil_%"]).clip(lower=0).round(2)
+
 kpi_shift["Ausschussquote (%)"] = (
-    kpi_shift["Gesamtausschuss"]
-    / kpi_shift["Gesamtstückzahl"].replace(0, pd.NA)
-    * 100
+    kpi_shift["Gesamtausschuss"] / kpi_shift["Gesamtstückzahl"].replace(0, np.nan) * 100
 ).fillna(0).round(2)
 
-# Tabelle anzeigen
 st.dataframe(
-    kpi_shift.sort_values("Stillstand_Std", ascending=False),
-    use_container_width=True
+    kpi_shift.sort_values("Stillstand_Anteil_%", ascending=False)[
+        ["Schicht", "Stillstand_h", "Stillstand_Anteil_%", "Nutzung_%", "Ausschussquote (%)"]
+    ],
+    use_container_width=True,
 )
 
-# Diagramm
-fig, ax = plt.subplots(figsize=(8, 4))
-
+# Balkendiagramm: Stillstand-Anteil (%)
+fig, ax = plt.subplots(figsize=FIG_WIDE)
 ax.bar(
     kpi_shift["Schicht"].astype(str),
-    kpi_shift["Stillstand_Std"],
-    width=0.4  # halbe Balkenbreite
+    kpi_shift["Stillstand_Anteil_%"],
+    width=BAR_WIDTH,
 )
 
-ax.set_ylabel("Stillstandszeit (Stunden)")
+ax.set_ylabel("Stillstand-Anteil (%)")
 ax.set_xlabel("Schicht")
-
-# Y-Achse bei 0 starten (Stunden machen Sinn bei 0)
-ax.set_ylim(
-    bottom=0,
-    top=kpi_shift["Stillstand_Std"].max() * 1.1
-)
-
-ax.tick_params(axis="x")
+ax.set_ylim(0, max(5, float(kpi_shift["Stillstand_Anteil_%"].max()) * 1.2))
+ax.yaxis.set_major_locator(MultipleLocator(5))
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 
 plt.tight_layout()
 st.pyplot(fig)
@@ -231,7 +284,7 @@ st.pyplot(fig)
 st.divider()
 
 # --------------------------------------------------
-# Chart 3: Trend over time (monthly)
+# Chart 3: Trend over time (monthly) - cleaner x labels + consistent size
 # --------------------------------------------------
 st.header("Zeitlicher Verlauf (monatlich)")
 
@@ -249,55 +302,74 @@ trend = (
 )
 
 trend["Ausschussquote (%)"] = (
-    (trend["Gesamtausschuss"] / trend["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+    trend["Gesamtausschuss"] / trend["Gesamtstückzahl"].replace(0, np.nan) * 100
 ).fillna(0).round(2)
+
+trend["Stillstand_h"] = (trend["Stillstand_Min"] / 60).fillna(0).round(2)
 
 st.dataframe(trend, use_container_width=True)
 
-# ✅ nur jeden 6. Monat beschriften (lesbar!)
+# X-Achse lesbar
 step = 6 if len(trend) > 24 else 3 if len(trend) > 12 else 1
 xt = trend["JahrMonat"][::step]
 
-fig, ax = plt.subplots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=FIG_TREND)
 ax.plot(trend["JahrMonat"], trend["Gesamtstückzahl"])
 ax.set_ylabel("Gesamtstückzahl")
 ax.set_xlabel("Monat")
 ax.set_xticks(xt)
 ax.set_xticklabels(xt, rotation=45, ha="right")
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 plt.tight_layout()
 st.pyplot(fig)
 
-fig, ax = plt.subplots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=FIG_TREND)
 ax.plot(trend["JahrMonat"], trend["Ausschussquote (%)"])
 ax.set_ylabel("Ausschussquote (%)")
 ax.set_xlabel("Monat")
 ax.set_xticks(xt)
 ax.set_xticklabels(xt, rotation=45, ha="right")
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
+plt.tight_layout()
+st.pyplot(fig)
+
+fig, ax = plt.subplots(figsize=FIG_TREND)
+ax.plot(trend["JahrMonat"], trend["Stillstand_h"])
+ax.set_ylabel("Stillstand (h)")
+ax.set_xlabel("Monat")
+ax.set_xticks(xt)
+ax.set_xticklabels(xt, rotation=45, ha="right")
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 plt.tight_layout()
 st.pyplot(fig)
 
 st.divider()
 
 # --------------------------------------------------
-# Chart 4: Energy per unit by line
+# Chart 4: Energy per unit by line (FIXED)
 # --------------------------------------------------
 st.header("Energieverbrauch pro Stück nach Produktionslinie")
 
 energy = kpi_line[["Produktionslinie", "Energie_kWh", "Gesamtstückzahl"]].copy()
 energy["kWh pro Stück"] = (
-    energy["Energie_kWh"] / energy["Gesamtstückzahl"].replace(0, pd.NA)
+    energy["Energie_kWh"] / energy["Gesamtstückzahl"].replace(0, np.nan)
 ).fillna(0).round(3)
 
 st.dataframe(
     energy[["Produktionslinie", "kWh pro Stück"]].sort_values("kWh pro Stück", ascending=False),
-    use_container_width=True
+    use_container_width=True,
 )
 
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(energy["Produktionslinie"].astype(str), energy["kWh pro Stück"])
+fig, ax = plt.subplots(figsize=FIG_WIDE)
+ax.bar(
+    energy["Produktionslinie"].astype(str),
+    energy["kWh pro Stück"],
+    width=BAR_WIDTH,
+)
 ax.set_ylabel("kWh pro Stück")
 ax.set_xlabel("Produktionslinie")
 ax.tick_params(axis="x", rotation=45)
+ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
 plt.tight_layout()
 st.pyplot(fig)
 
