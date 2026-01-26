@@ -144,30 +144,26 @@ kpi_line = (
 )
 
 kpi_line["Ausschussquote (%)"] = (
-    (kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+    kpi_line["Gesamtausschuss"]
+    / kpi_line["Gesamtstückzahl"].replace(0, np.nan)
+    * 100
 ).fillna(0).round(2)
 
-st.dataframe(
-    kpi_line.sort_values("Ausschussquote (%)", ascending=False),
-    use_container_width=True
-)
+st.dataframe(kpi_line.sort_values("Ausschussquote (%)", ascending=False), use_container_width=True)
 
-# Plot
-fig, ax = plt.subplots(figsize=(8, 4))
-
+fig, ax = plt.subplots(figsize=FIG_WIDE)
 ax.bar(
     kpi_line["Produktionslinie"].astype(str),
     kpi_line["Ausschussquote (%)"],
-    width=0.4  # Balkenbreite halbiert
+    width=BAR_WIDTH
 )
 
-# Y-Achse: 0 % – 6 % mit Schritt 0.1
-ax.set_ylim(0, 6)
-ax.set_yticks([i / 10 for i in range(0, 61)])
-
+ax.set_ylim(4, 6)
+ax.set_yticks(np.arange(4, 6.1, 0.1))
 ax.set_ylabel("Ausschussquote (%)")
 ax.set_xlabel("Produktionslinie")
 ax.tick_params(axis="x", rotation=45)
+ax.grid(axis="y", linestyle="--", alpha=0.4)
 
 plt.tight_layout()
 st.pyplot(fig)
