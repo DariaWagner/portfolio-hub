@@ -258,7 +258,7 @@ with col2:
     ax.set_xticks(x)
     ax.set_xticklabels(kpi_shift["Schicht"])
     ax.set_ylim(0, 105)
-    ax.legend(loc='upper right')
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=2, frameon=False)
     ax.grid(axis="y", linestyle="--", alpha=GRID_ALPHA)
     
     # Beschriftungen
