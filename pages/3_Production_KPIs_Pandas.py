@@ -257,7 +257,7 @@ ax.grid(axis="y", linestyle="--", alpha=0.4)
 for i, row in kpi_shift.iterrows():
     ax.text(
         i,
-        -8,
+        -12,
         f"Nutzung {row['Nutzung_%']} %\nStillstand {row['Stillstand_%']} %",
         ha="center",
         va="top",
