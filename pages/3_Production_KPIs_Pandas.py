@@ -131,58 +131,49 @@ st.divider()
 # --------------------------------------------------
 # Chart 1: Scrap rate by line
 # --------------------------------------------------
+
 st.header("Ausschussquote nach Produktionslinie")
 
-# KPI-Berechnung
 kpi_line = (
     df_f.groupby("Produktionslinie", dropna=False)
     .agg(
         Gesamtstückzahl=("Stueckzahl", "sum"),
         Gesamtausschuss=("Ausschuss", "sum"),
-        Stillstand_Min=("Stillstandszeit_Min", "sum"),
-        Energie_kWh=("Energieverbrauch_kWh", "sum"),
-        Materialkosten=("Materialkosten", "sum"),
     )
     .reset_index()
 )
 
-# Ausschussquote berechnen
 kpi_line["Ausschussquote (%)"] = (
-    kpi_line["Gesamtausschuss"]
-    / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)
-    * 100
+    (kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)) * 100
 ).fillna(0).round(2)
 
-# Tabelle anzeigen
 st.dataframe(
     kpi_line.sort_values("Ausschussquote (%)", ascending=False),
     use_container_width=True
 )
 
-# Diagramm
+# Plot
 fig, ax = plt.subplots(figsize=(8, 4))
 
 ax.bar(
     kpi_line["Produktionslinie"].astype(str),
     kpi_line["Ausschussquote (%)"],
-    width=0.4  # halbe Balkenbreite
+    width=0.4  # Balkenbreite halbiert
 )
+
+# Y-Achse: 0 % – 6 % mit Schritt 0.1
+ax.set_ylim(0, 6)
+ax.set_yticks([i / 10 for i in range(0, 61)])
 
 ax.set_ylabel("Ausschussquote (%)")
 ax.set_xlabel("Produktionslinie")
-
-# Y-Achse nicht bei 0 starten
-ax.set_ylim(
-    bottom=0.1,
-    top=kpi_line["Ausschussquote (%)"].max() * 1.1
-)
-
 ax.tick_params(axis="x", rotation=45)
 
 plt.tight_layout()
 st.pyplot(fig)
 
 st.divider()
+
 
 # --------------------------------------------------
 # Chart 2: Downtime by shift
