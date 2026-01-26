@@ -133,6 +133,7 @@ st.divider()
 # --------------------------------------------------
 st.header("Ausschussquote nach Produktionslinie")
 
+# KPI-Berechnung
 kpi_line = (
     df_f.groupby("Produktionslinie", dropna=False)
     .agg(
@@ -145,20 +146,39 @@ kpi_line = (
     .reset_index()
 )
 
+# Ausschussquote berechnen
 kpi_line["Ausschussquote (%)"] = (
-    (kpi_line["Gesamtausschuss"] / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+    kpi_line["Gesamtausschuss"]
+    / kpi_line["Gesamtstückzahl"].replace(0, pd.NA)
+    * 100
 ).fillna(0).round(2)
 
+# Tabelle anzeigen
 st.dataframe(
     kpi_line.sort_values("Ausschussquote (%)", ascending=False),
     use_container_width=True
 )
 
+# Diagramm
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(kpi_line["Produktionslinie"].astype(str), kpi_line["Ausschussquote (%)"])
+
+ax.bar(
+    kpi_line["Produktionslinie"].astype(str),
+    kpi_line["Ausschussquote (%)"],
+    width=0.4  # halbe Balkenbreite
+)
+
 ax.set_ylabel("Ausschussquote (%)")
 ax.set_xlabel("Produktionslinie")
+
+# Y-Achse nicht bei 0 starten
+ax.set_ylim(
+    bottom=0.1,
+    top=kpi_line["Ausschussquote (%)"].max() * 1.1
+)
+
 ax.tick_params(axis="x", rotation=45)
+
 plt.tight_layout()
 st.pyplot(fig)
 
@@ -169,6 +189,7 @@ st.divider()
 # --------------------------------------------------
 st.header("Stillstandszeit nach Schicht")
 
+# KPI-Berechnung
 kpi_shift = (
     df_f.groupby("Schicht", dropna=False)
     .agg(
@@ -179,19 +200,42 @@ kpi_shift = (
     .reset_index()
 )
 
+# Stillstand von Minuten → Stunden umrechnen
+kpi_shift["Stillstand_Std"] = (kpi_shift["Stillstand_Min"] / 60).round(2)
+
+# Ausschussquote (optional, für Tabelle)
 kpi_shift["Ausschussquote (%)"] = (
-    (kpi_shift["Gesamtausschuss"] / kpi_shift["Gesamtstückzahl"].replace(0, pd.NA)) * 100
+    kpi_shift["Gesamtausschuss"]
+    / kpi_shift["Gesamtstückzahl"].replace(0, pd.NA)
+    * 100
 ).fillna(0).round(2)
 
+# Tabelle anzeigen
 st.dataframe(
-    kpi_shift.sort_values("Stillstand_Min", ascending=False),
+    kpi_shift.sort_values("Stillstand_Std", ascending=False),
     use_container_width=True
 )
 
+# Diagramm
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.bar(kpi_shift["Schicht"].astype(str), kpi_shift["Stillstand_Min"])
-ax.set_ylabel("Stillstand (Minuten)")
+
+ax.bar(
+    kpi_shift["Schicht"].astype(str),
+    kpi_shift["Stillstand_Std"],
+    width=0.4  # halbe Balkenbreite
+)
+
+ax.set_ylabel("Stillstandszeit (Stunden)")
 ax.set_xlabel("Schicht")
+
+# Y-Achse bei 0 starten (Stunden machen Sinn bei 0)
+ax.set_ylim(
+    bottom=0,
+    top=kpi_shift["Stillstand_Std"].max() * 1.1
+)
+
+ax.tick_params(axis="x")
+
 plt.tight_layout()
 st.pyplot(fig)
 
