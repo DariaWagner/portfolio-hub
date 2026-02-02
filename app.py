@@ -121,29 +121,6 @@ with right:
     </div>
     """, unsafe_allow_html=True)
 
-**KPIBuilder**  
-→ Berechnet KPIs wie Ausschussquote, OEE, Stillstandszeiten und Durchlaufzeiten.
-
-**ReportGenerator**  
-→ Aggregiert Ergebnisse, erstellt Tabellen und Visualisierungen für das Dashboard.
-
-Diese Struktur simuliert eine realistische Trennung von Datenlogik, Analyse und Reporting.
-""")
-
-st.subheader("Identifizierte Prozessengpässe")
-st.markdown("""
-1. **Auffällig hohe Ausschussquote in Linie 3**  
-   → Deutlich über dem Durchschnitt der anderen Linien. Mögliche Ursachen: Maschinenkalibrierung, Materialqualität.
-
-2. **Erhöhte Stillstandszeiten in der Spätschicht (22–02 Uhr)**  
-   → Muster deutet auf Personalengpässe oder Wartungsbedarf hin.
-
-3. **Materialnachschub vor Station X verzögert**  
-   → Wiederkehrende Wartezeiten zeigen Optimierungspotenzial in der Logistikplanung.
-""")
-
-st.divider()
-
 # =========================
 # Closing
 # =========================
