@@ -8,6 +8,7 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+
 with st.sidebar:
     st.markdown("### 🔧 Tech‑Stack")
     st.markdown("""
@@ -67,57 +68,65 @@ st.divider()
 # =========================
 # Project Overview
 # =========================
-# =========================
-# Projektübersicht – verbessert
-# =========================
 st.markdown("## Projektübersicht")
 
 left, right = st.columns(2)
 
-with left:
-    st.markdown("""
-    <div style="padding:20px; border:1px solid #e0e0e0; border-radius:8px;">
-        <h3 style="margin-bottom:8px;">Pandas KPI Dashboard</h3>
-        <hr style="margin-top:0; margin-bottom:15px;">
+# Modern Business Card Style
+card_style = """
+    padding: 25px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border: 1px solid #f2f2f2;
+"""
 
-        <strong>Funktionen</strong>
-        <ul>
+# Pandas Card
+with left:
+    st.markdown(f"""
+    <div style="{card_style}">
+        <h3 style="margin-bottom:12px; font-weight:600; color:#333;">Pandas KPI Dashboard</h3>
+        <hr style="margin-top:0; margin-bottom:18px; border:0; border-top:1px solid #e6e6e6;">
+
+        <p style="color:#444; margin-bottom:4px;"><strong>Funktionen</strong></p>
+        <ul style="color:#444; margin-top:0;">
             <li>KPI‑Berechnung (Output, Ausschuss, Energie, Stillstand)</li>
             <li>Interaktive Filter (Zeitraum, Linie, Schicht)</li>
             <li>Zeitreihenanalysen & Linienvergleich</li>
         </ul>
 
-        <strong>Kurzbeschreibung</strong>
-        <p>
+        <p style="color:#444; margin-top:18px;"><strong>Kurzbeschreibung</strong></p>
+        <p style="color:#444; margin-top:-8px;">
             Analyse eines synthetischen Produktionsdatensatzes mit Pandas.
             Fokus auf KPI‑Definition, Datenbereinigung und fachliche Interpretation.
         </p>
 
-        <p style="font-size:13px; color:#666;">Seite: Production KPIs (Pandas)</p>
+        <p style="font-size:13px; color:#777; margin-top:20px;">Seite: Production KPIs (Pandas)</p>
     </div>
     """, unsafe_allow_html=True)
 
+# SQL Card
 with right:
-    st.markdown("""
-    <div style="padding:20px; border:1px solid #e0e0e0; border-radius:8px;">
-        <h3 style="margin-bottom:8px;">SQL Data Analysis</h3>
-        <hr style="margin-top:0; margin-bottom:15px;">
+    st.markdown(f"""
+    <div style="{card_style}">
+        <h3 style="margin-bottom:12px; font-weight:600; color:#333;">SQL Data Analysis</h3>
+        <hr style="margin-top:0; margin-bottom:18px; border:0; border-top:1px solid #e6e6e6;">
 
-        <strong>Funktionen</strong>
-        <ul>
+        <p style="color:#444; margin-bottom:4px;"><strong>Funktionen</strong></p>
+        <ul style="color:#444; margin-top:0;">
             <li>Business‑Fragen beantworten</li>
             <li>SQL‑ähnliche Abfragen (JOIN, GROUP BY, Aggregationen)</li>
             <li>Visualisierung der Ergebnisse</li>
         </ul>
 
-        <strong>Kurzbeschreibung</strong>
-        <p>
+        <p style="color:#444; margin-top:18px;"><strong>Kurzbeschreibung</strong></p>
+        <p style="color:#444; margin-top:-8px;">
             Simulation einer SQL‑Analyse mit relationalem Modell
             (Faktentabelle + Dimensionstabellen).
             Fokus auf Query‑Logik und strukturierte Ergebnisdarstellung.
         </p>
 
-        <p style="font-size:13px; color:#666;">Seite: SQL Data Analysis</p>
+        <p style="font-size:13px; color:#777; margin-top:20px;">Seite: SQL Data Analysis</p>
     </div>
     """, unsafe_allow_html=True)
 
