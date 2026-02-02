@@ -334,105 +334,56 @@ method_col1, method_col2, method_col3 = st.columns(3)
 # Pandas Card
 with method_col1:
     st.markdown("""
-    <div class='method-card'>
-        <div class='method-title'>
-            <span style='font-size: 1.8rem;'>🐼</span>
-            Pandas KPI Dashboard
-        </div>
-        <hr class='method-divider'>
+    Funktionen:
+-----------
+- KPI-Berechnung (Output, Ausschuss, Energie, Stillstand)
+- Interaktive Filter (Zeitraum, Linie, Schicht, Produkt)
+- Zeitreihen-Analysen & Linienvergleich
+- Trendanalysen und Mustererkennungen
 
-        <div class='method-section'>
-            <h4>✨ Funktionen</h4>
-            <ul class='method-list'>
-                <li>KPI-Berechnung (Output, Ausschuss, Energie, Stillstand)</li>
-                <li>Interaktive Filter (Zeitraum, Linie, Schicht, Produkt)</li>
-                <li>Zeitreihen-Analysen & Linienvergleich</li>
-                <li>Trendanalysen und Mustererkennungen</li>
-            </ul>
-        </div>
+Kurzbeschreibung:
+-----------------
+Analyse eines Produktionsdatensatzes mit Pandas.
+Fokus auf KPI-Definition, Datenbereinigung und fachlicher Interpretation.
+Ermöglicht schnelle explorative Analysen und flexible Datenauswertung.
 
-        <div class='method-section'>
-            <h4>📝 Kurzbeschreibung</h4>
-            <p class='method-description'>
-                Analyse eines Produktionsdatensatzes mit Pandas.
-                Fokus auf KPI-Definition, Datenbereinigung und fachlicher Interpretation.
-                Ermöglicht schnelle explorative Analysen und flexible Datenauswertung.
-            </p>
-        </div>
-
-        <span class='method-badge'>➡️ Seite: Production KPIs (Pandas)</span>
-    </div>
     """, unsafe_allow_html=True)
 
 # SQL Card
 with method_col2:
     st.markdown("""
-    <div class='method-card'>
-        <div class='method-title'>
-            <span style='font-size: 1.8rem;'>🗄️</span>
-            SQL Data Analysis
-        </div>
-        <hr class='method-divider'>
+    Funktionen:
+-----------
+- Typische Business-Fragen (z.B. "Welche Linie hat die höchste Ausschussquote?")
+- SQL-ähnliche Abfragen (JOINs, GROUP BY, Aggregationen)
+- Visualisierung der Ergebnisse
+- Strukturierte Datenmodellierung
 
-        <div class='method-section'>
-            <h4>✨ Funktionen</h4>
-            <ul class='method-list'>
-                <li>Typische Business-Fragen (z.B. "Welche Linie hat die höchste Ausschussquote?")</li>
-                <li>SQL-ähnliche Abfragen (JOINs, GROUP BY, Aggregationen)</li>
-                <li>Visualisierung der Ergebnisse</li>
-                <li>Strukturierte Datenmodellierung</li>
-            </ul>
-        </div>
-
-        <div class='method-section'>
-            <h4>📝 Kurzbeschreibung</h4>
-            <p class='method-description'>
-                Simulation einer SQL-Datenanalyse mit relationalem Modell
-                (Faktentabelle + Dimensionstabellen).
-                Fokus auf Query-Logik und strukturierte Ergebnisdarstellung für Business Intelligence.
-            </p>
-        </div>
-
-        <span class='method-badge'>➡️ Seite: SQL Data Analysis</span>
-    </div>
+Kurzbeschreibung:
+-----------------
+Simulation einer SQL-Datenanalyse mit relationalem Modell
+(Faktentabelle + Dimensionstabellen).
+Fokus auf Query-Logik und strukturierte Ergebnisdarstellung für Business Intelligence.
     """, unsafe_allow_html=True)
 
 # OOP Card
 with method_col3:
     st.markdown("""
-    <div class='method-card'>
-        <div class='method-title'>
-            <span style='font-size: 1.8rem;'>⚙️</span>
-            OOP Produktionsanalyse
-        </div>
-        <hr class='method-divider'>
+    Architektur:
+------------
+ProductionDataProcessor
+→ Lädt Rohdaten, bereinigt sie und führt Typkonvertierungen durch.
 
-        <div class='method-section'>
-            <h4>✨ Architektur</h4>
-            <p class='method-description' style='margin-bottom: 0.8rem;'>
-                <strong>ProductionDataProcessor</strong><br>
-                → Lädt Rohdaten, bereinigt sie und führt Typkonvertierungen durch.
-            </p>
-            <p class='method-description' style='margin-bottom: 0.8rem;'>
-                <strong>KPIBuilder</strong><br>
-                → Berechnet KPIs wie Ausschussquote, OEE, Stillstandszeiten und Durchlaufzeiten.
-            </p>
-            <p class='method-description' style='margin-bottom: 0.8rem;'>
-                <strong>ReportGenerator</strong><br>
-                → Aggregiert Ergebnisse, erstellt Tabellen und Visualisierungen für das Dashboard.
-            </p>
-        </div>
+KPIBuilder
+→ Berechnet KPIs wie Ausschussquote, OEE, Stillstandszeiten und Durchlaufzeiten.
 
-        <div class='method-section'>
-            <h4>📝 Kurzbeschreibung</h4>
-            <p class='method-description'>
-                Diese Struktur simuliert eine realistische Trennung von Datenlogik, 
-                Analyse und Reporting. Ermöglicht modulare, wartbare und skalierbare Analysepipelines.
-            </p>
-        </div>
+ReportGenerator
+→ Aggregiert Ergebnisse, erstellt Tabellen und Visualisierungen für das Dashboard.
 
-        <span class='method-badge'>➡️ Seite: OOP Produktionsanalyse</span>
-    </div>
+Kurzbeschreibung:
+-----------------
+Diese Struktur simuliert eine realistische Trennung von Datenlogik, 
+Analyse und Reporting. Ermöglicht modulare, wartbare und skalierbare Analysepipelines.
     """, unsafe_allow_html=True)
 
 # =========================
