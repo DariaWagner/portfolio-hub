@@ -70,52 +70,56 @@ st.divider()
 # =========================
 # Projektübersicht – verbessert
 # =========================
-st.markdown("## 📁 Projektübersicht")
+st.markdown("## Projektübersicht")
 
 left, right = st.columns(2)
 
 with left:
-    st.container()
-    st.subheader("🐼 Pandas KPI Dashboard")
     st.markdown("""
-    **Funktionen**
-    - KPI‑Berechnung (Output, Ausschuss, Energie, Stillstand)
-    - Interaktive Filter (Zeitraum, Linie, Schicht, Produkt)
-    - Zeitreihen‑Analysen & Linienvergleich
+    <div style="padding:20px; border:1px solid #e0e0e0; border-radius:8px;">
+        <h3 style="margin-bottom:8px;">Pandas KPI Dashboard</h3>
+        <hr style="margin-top:0; margin-bottom:15px;">
 
-    **Kurzbeschreibung**  
-    Analyse eines Produktionsdatensatzes mit Pandas.  
-    Fokus auf KPI‑Definition, Datenbereinigung und fachlicher Interpretation.
-    """)
-    st.caption("➡️ Seite: *Production KPIs (Pandas)*")
+        <strong>Funktionen</strong>
+        <ul>
+            <li>KPI‑Berechnung (Output, Ausschuss, Energie, Stillstand)</li>
+            <li>Interaktive Filter (Zeitraum, Linie, Schicht)</li>
+            <li>Zeitreihenanalysen & Linienvergleich</li>
+        </ul>
+
+        <strong>Kurzbeschreibung</strong>
+        <p>
+            Analyse eines synthetischen Produktionsdatensatzes mit Pandas.
+            Fokus auf KPI‑Definition, Datenbereinigung und fachliche Interpretation.
+        </p>
+
+        <p style="font-size:13px; color:#666;">Seite: Production KPIs (Pandas)</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 with right:
-    st.container()
-    st.subheader("🗄️ SQL Data Analysis")
     st.markdown("""
-    **Funktionen**
-    - Typische Business‑Fragen (z. B. „Welche Linie hat die höchste Ausschussquote?“)
-    - SQL‑ähnliche Abfragen (JOINs, GROUP BY, Aggregationen)
-    - Visualisierung der Ergebnisse
+    <div style="padding:20px; border:1px solid #e0e0e0; border-radius:8px;">
+        <h3 style="margin-bottom:8px;">SQL Data Analysis</h3>
+        <hr style="margin-top:0; margin-bottom:15px;">
 
-    **Kurzbeschreibung**  
-    Simulation einer SQL‑Datenanalyse mit relationalem Modell  
-    (Faktentabelle + Dimensionstabellen).  
-    Fokus auf Query‑Logik und strukturierte Ergebnisdarstellung.
-    """)
-    st.caption("➡️ Seite: *SQL Data Analysis*")
+        <strong>Funktionen</strong>
+        <ul>
+            <li>Business‑Fragen beantworten</li>
+            <li>SQL‑ähnliche Abfragen (JOIN, GROUP BY, Aggregationen)</li>
+            <li>Visualisierung der Ergebnisse</li>
+        </ul>
 
+        <strong>Kurzbeschreibung</strong>
+        <p>
+            Simulation einer SQL‑Analyse mit relationalem Modell
+            (Faktentabelle + Dimensionstabellen).
+            Fokus auf Query‑Logik und strukturierte Ergebnisdarstellung.
+        </p>
 
-st.subheader("🧩 OOP – Produktionsanalyse")
-st.write(
-    "Objektorientierte Modellierung von Produktionsdaten. "
-    "Trennung von Datenlogik, Analyse und Auswertung zur Simulation einer realistischen Software-Struktur."
-)
-st.caption("➡️ Seite: *OOP_Produktionsanalyse*")
-st.subheader("Architektur der OOP‑Produktionsanalyse")
-st.markdown("""
-**ProductionDataProcessor**  
-→ Lädt Rohdaten, bereinigt sie und führt Typkonvertierungen durch.
+        <p style="font-size:13px; color:#666;">Seite: SQL Data Analysis</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 **KPIBuilder**  
 → Berechnet KPIs wie Ausschussquote, OEE, Stillstandszeiten und Durchlaufzeiten.
