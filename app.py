@@ -67,29 +67,44 @@ st.divider()
 # =========================
 # Project Overview
 # =========================
+# =========================
+# Projektübersicht – verbessert
+# =========================
+st.markdown("## 📁 Projektübersicht")
+
 left, right = st.columns(2)
 
 with left:
+    st.container()
     st.subheader("🐼 Pandas KPI Dashboard")
-    st.markdown(
-        "- **KPIs & Filter**\n"
-        "- **Zeitreihen & Vergleich**\n"
-        "- **Produktions-, Kosten- & Energiedaten**\n\n"
-        "**Kurzbeschreibung:** Analyse von Produktions-, Kosten- und Energiedaten mit Pandas. "
-        "Berechnung zentraler KPIs, Zeitreihenanalysen und Vergleich verschiedener Produktionslinien."
-    )
+    st.markdown("""
+    **Funktionen**
+    - KPI‑Berechnung (Output, Ausschuss, Energie, Stillstand)
+    - Interaktive Filter (Zeitraum, Linie, Schicht, Produkt)
+    - Zeitreihen‑Analysen & Linienvergleich
+
+    **Kurzbeschreibung**  
+    Analyse eines Produktionsdatensatzes mit Pandas.  
+    Fokus auf KPI‑Definition, Datenbereinigung und fachlicher Interpretation.
+    """)
     st.caption("➡️ Seite: *Production KPIs (Pandas)*")
 
 with right:
+    st.container()
     st.subheader("🗄️ SQL Data Analysis")
-    st.markdown(
-        "- **Business-Fragen**\n"
-        "- **SQL-Queries**\n"
-        "- **Ergebnis + Visualisierung**\n\n"
-        "**Kurzbeschreibung:** Beantwortung typischer Business-Fragen mit SQL-Logik. "
-        "Fokus auf saubere Queries, strukturierte Ergebnisse und verständliche Visualisierungen."
-    )
+    st.markdown("""
+    **Funktionen**
+    - Typische Business‑Fragen (z. B. „Welche Linie hat die höchste Ausschussquote?“)
+    - SQL‑ähnliche Abfragen (JOINs, GROUP BY, Aggregationen)
+    - Visualisierung der Ergebnisse
+
+    **Kurzbeschreibung**  
+    Simulation einer SQL‑Datenanalyse mit relationalem Modell  
+    (Faktentabelle + Dimensionstabellen).  
+    Fokus auf Query‑Logik und strukturierte Ergebnisdarstellung.
+    """)
     st.caption("➡️ Seite: *SQL Data Analysis*")
+
 
 st.subheader("🧩 OOP – Produktionsanalyse")
 st.write(
