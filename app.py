@@ -342,34 +342,25 @@ with method_col1:
         <hr class='method-divider'>
 
         <div class='method-section'>
-            <h4>✨ Kernfunktionen</h4>
+            <h4>✨ Funktionen</h4>
             <ul class='method-list'>
-                <li>Echtzeit-KPI-Berechnung (OEE, Ausschussquote, Energieeffizienz)</li>
-                <li>Interaktive Zeitraum- und Dimensionsfilter</li>
-                <li>Dynamische Visualisierungen mit Plotly</li>
-                <li>Trend- und Anomalieerkennung</li>
+                <li>KPI-Berechnung (Output, Ausschuss, Energie, Stillstand)</li>
+                <li>Interaktive Filter (Zeitraum, Linie, Schicht, Produkt)</li>
+                <li>Zeitreihen-Analysen & Linienvergleich</li>
+                <li>Trendanalysen und Mustererkennungen</li>
             </ul>
         </div>
 
         <div class='method-section'>
-            <h4>🎯 Anwendungsfall</h4>
+            <h4>📝 Kurzbeschreibung</h4>
             <p class='method-description'>
-                Ideal für <strong>explorative Datenanalyse</strong> und schnelles Prototyping. 
-                Pandas ermöglicht flexible Datenmanipulation und ist perfekt für 
-                Ad-hoc-Analysen und Reporting-Dashboards.
+                Analyse eines Produktionsdatensatzes mit Pandas.
+                Fokus auf KPI-Definition, Datenbereinigung und fachlicher Interpretation.
+                Ermöglicht schnelle explorative Analysen und flexible Datenauswertung.
             </p>
         </div>
 
-        <div class='method-section'>
-            <h4>💡 Technologie-Highlights</h4>
-            <ul class='method-list'>
-                <li>DataFrame-Operationen & Aggregationen</li>
-                <li>Time-Series-Analyse</li>
-                <li>Statistical Computing</li>
-            </ul>
-        </div>
-
-        <span class='method-badge'>📄 Seite: Production KPIs (Pandas)</span>
+        <span class='method-badge'>➡️ Seite: Production KPIs (Pandas)</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -384,34 +375,25 @@ with method_col2:
         <hr class='method-divider'>
 
         <div class='method-section'>
-            <h4>✨ Kernfunktionen</h4>
+            <h4>✨ Funktionen</h4>
             <ul class='method-list'>
-                <li>Strukturierte Business-Queries mit JOINs</li>
-                <li>Komplexe Aggregationen & Gruppierungen</li>
-                <li>Window Functions für Rankings</li>
-                <li>Subqueries und CTEs</li>
+                <li>Typische Business-Fragen (z.B. "Welche Linie hat die höchste Ausschussquote?")</li>
+                <li>SQL-ähnliche Abfragen (JOINs, GROUP BY, Aggregationen)</li>
+                <li>Visualisierung der Ergebnisse</li>
+                <li>Strukturierte Datenmodellierung</li>
             </ul>
         </div>
 
         <div class='method-section'>
-            <h4>🎯 Anwendungsfall</h4>
+            <h4>📝 Kurzbeschreibung</h4>
             <p class='method-description'>
-                Perfekt für <strong>Business Intelligence</strong> und strukturierte Reportings. 
-                SQL-Logik ist der Standard in Data Warehouses, BI-Tools und 
-                unternehmensweiten Analyse-Infrastrukturen.
+                Simulation einer SQL-Datenanalyse mit relationalem Modell
+                (Faktentabelle + Dimensionstabellen).
+                Fokus auf Query-Logik und strukturierte Ergebnisdarstellung für Business Intelligence.
             </p>
         </div>
 
-        <div class='method-section'>
-            <h4>💡 Technologie-Highlights</h4>
-            <ul class='method-list'>
-                <li>Relationale Datenmodellierung</li>
-                <li>Query-Optimierung</li>
-                <li>OLAP-Operationen</li>
-            </ul>
-        </div>
-
-        <span class='method-badge'>📄 Seite: SQL Data Analysis</span>
+        <span class='method-badge'>➡️ Seite: SQL Data Analysis</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -421,39 +403,35 @@ with method_col3:
     <div class='method-card'>
         <div class='method-title'>
             <span style='font-size: 1.8rem;'>⚙️</span>
-            OOP Architektur
+            OOP Produktionsanalyse
         </div>
         <hr class='method-divider'>
 
         <div class='method-section'>
-            <h4>✨ Kernfunktionen</h4>
-            <ul class='method-list'>
-                <li>Modulare Klassen-Hierarchie</li>
-                <li>Separation of Concerns (Data, Logic, View)</li>
-                <li>Wiederverwendbare Komponenten</li>
-                <li>Unit-Test-fähige Struktur</li>
-            </ul>
-        </div>
-
-        <div class='method-section'>
-            <h4>🎯 Anwendungsfall</h4>
-            <p class='method-description'>
-                Essentiell für <strong>skalierbare Enterprise-Lösungen</strong>. 
-                OOP ermöglicht wartbaren, erweiterbaren Code und ist Standard in 
-                professionellen Software- und Datenanalyseprojekten.
+            <h4>✨ Architektur</h4>
+            <p class='method-description' style='margin-bottom: 0.8rem;'>
+                <strong>ProductionDataProcessor</strong><br>
+                → Lädt Rohdaten, bereinigt sie und führt Typkonvertierungen durch.
+            </p>
+            <p class='method-description' style='margin-bottom: 0.8rem;'>
+                <strong>KPIBuilder</strong><br>
+                → Berechnet KPIs wie Ausschussquote, OEE, Stillstandszeiten und Durchlaufzeiten.
+            </p>
+            <p class='method-description' style='margin-bottom: 0.8rem;'>
+                <strong>ReportGenerator</strong><br>
+                → Aggregiert Ergebnisse, erstellt Tabellen und Visualisierungen für das Dashboard.
             </p>
         </div>
 
         <div class='method-section'>
-            <h4>💡 Technologie-Highlights</h4>
-            <ul class='method-list'>
-                <li>Design Patterns (Factory, Strategy)</li>
-                <li>SOLID-Prinzipien</li>
-                <li>Clean Code Architecture</li>
-            </ul>
+            <h4>📝 Kurzbeschreibung</h4>
+            <p class='method-description'>
+                Diese Struktur simuliert eine realistische Trennung von Datenlogik, 
+                Analyse und Reporting. Ermöglicht modulare, wartbare und skalierbare Analysepipelines.
+            </p>
         </div>
 
-        <span class='method-badge'>📄 Seite: OOP Produktionsanalyse</span>
+        <span class='method-badge'>➡️ Seite: OOP Produktionsanalyse</span>
     </div>
     """, unsafe_allow_html=True)
 
