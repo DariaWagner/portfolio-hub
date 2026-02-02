@@ -8,6 +8,14 @@ st.set_page_config(
     page_icon="📊",
     layout="wide"
 )
+with st.sidebar:
+    st.markdown("### 🔧 Tech‑Stack")
+    st.markdown("""
+    ![Python](https://img.shields.io/badge/Python-3.10-blue)
+    ![Pandas](https://img.shields.io/badge/Pandas-2.1-green)
+    ![Plotly](https://img.shields.io/badge/Plotly-5.x-orange)
+    ![Streamlit](https://img.shields.io/badge/Streamlit-latest-red)
+    """)
 
 # =========================
 # Header
