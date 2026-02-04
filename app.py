@@ -144,7 +144,7 @@ if st.session_state.page == 0:
     st.markdown("""
     <div class='cover-container'>
         <div class='cover-title'>DARIA WAGNER</div>
-        <div class='cover-subtitle'>Data & Process Analytics</div>
+        <div class='cover-subtitle'>Fachinformatikerin für Daten- und Prozessanalyse</div>
         <p style='font-size: 1.1rem; margin: 1rem 0;'>Portfolio • Lebenslauf • Praxisprojekt</p>
         <p style='font-size: 0.9rem; margin-top: 2rem; opacity: 0.9;'>Praktikum: 01.06.2026 – 02.04.2027</p>
     </div>
@@ -218,7 +218,7 @@ elif st.session_state.page == 2:
         # Umschulung
         st.markdown("<div class='timeline-item'>", unsafe_allow_html=True)
         st.markdown("**08/2025 – HEUTE**")
-        st.markdown("### Umschulung Fachinformatikerin")
+        st.markdown("### Umschulung Fachinformatikerin für Daten- und Prozessanalyse")
         st.markdown("*Institut für berufliche Bildung, Münster*")
         st.write("**Praxisprojekt – Produktionsdatenanalyse**")
         st.write("• Datenanalyse mit Python, SQL")
