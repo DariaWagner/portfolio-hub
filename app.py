@@ -1,27 +1,30 @@
+"""
+Daria Wagner - Interaktiver Magazin-Lebenslauf
+Portfolio & CV - FINALE VERSION
+"""
 
 import streamlit as st
 from datetime import datetime
 
-
+# =========================
 # Page Configuration
-
+# =========================
 st.set_page_config(
     page_title="Bewerbung",
     page_icon="📘",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-st.sidebar.title("📘 Bewerbung")
-st.sidebar.markdown("---")
 
+# =========================
 # CSS
-
+# =========================
 st.markdown("""
 <style>
     .main {
         background-color: #1a1d23;
     }
-    
+
     .cover-container {
         background: linear-gradient(135deg, #F4A58A 0%, #ED8F7C 100%);
         padding: 4rem 2rem;
@@ -30,18 +33,18 @@ st.markdown("""
         color: white;
         margin: 2rem 0;
     }
-    
+
     .cover-title {
         font-size: 3rem;
         font-weight: 700;
         margin-bottom: 0.8rem;
     }
-    
+
     .cover-subtitle {
         font-size: 1.3rem;
         margin-bottom: 2rem;
     }
-    
+
     .page-container {
         background: white;
         padding: 2rem;
@@ -49,7 +52,7 @@ st.markdown("""
         margin: 1rem 0;
         color: black;
     }
-    
+
     .timeline-item {
         background: #f7f7f7;
         padding: 1rem;
@@ -57,7 +60,7 @@ st.markdown("""
         border-left: 4px solid #F4A58A;
         border-radius: 6px;
     }
-    
+
     .section-title {
         color: #F4A58A;
         font-size: 1.8rem;
@@ -66,7 +69,7 @@ st.markdown("""
         padding-bottom: 0.5rem;
         margin: 1.5rem 0 1rem 0;
     }
-    
+
     .page-nav {
         background: #2d3035;
         padding: 1rem;
@@ -78,23 +81,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
+# =========================
 # Session State
-
+# =========================
 if "page" not in st.session_state:
     st.session_state.page = 0
+
 
 def next_page():
     st.session_state.page += 1
 
+
 def prev_page():
     st.session_state.page -= 1
+
 
 def go_to_page(page_num):
     st.session_state.page = page_num
 
 
+# =========================
 # Sidebar Navigation
+# =========================
+# Titel in Sidebar (ersetzt "app")
+st.sidebar.markdown("# 📘 Bewerbung")
+st.sidebar.markdown("---")
 
 with st.sidebar:
     st.markdown("## 📘 Navigation")
@@ -121,13 +132,14 @@ with st.sidebar:
     try:
         with open("/mnt/user-data/uploads/Lebenslauf_Elternzeit.pdf", "rb") as pdf_file:
             pdf_data = pdf_file.read()
-        st.download_button("📄 Lebenslauf", data=pdf_data, file_name="Lebenslauf_Daria_Wagner.pdf", mime="application/pdf")
+        st.download_button("📄 Lebenslauf", data=pdf_data, file_name="Lebenslauf_Daria_Wagner.pdf",
+                           mime="application/pdf")
     except:
         st.download_button("📄 Lebenslauf", data=b"", file_name="CV_Daria_Wagner.pdf")
 
-
+# =========================
 # PAGE 0: COVER
-
+# =========================
 if st.session_state.page == 0:
     st.markdown("""
     <div class='cover-container'>
@@ -138,9 +150,9 @@ if st.session_state.page == 0:
     </div>
     """, unsafe_allow_html=True)
 
-
+# =========================
 # PAGE 1: ÜBER MICH
-
+# =========================
 elif st.session_state.page == 1:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Über mich</h1>", unsafe_allow_html=True)
@@ -188,13 +200,14 @@ elif st.session_state.page == 1:
         dass daraus fundierte und verständliche Entscheidungen entstehen.
         """)
 
-        st.info("🎯 **Was mich antreibt:** Daten in verständliche Insights zu verwandeln und damit Prozesse messbar zu verbessern.")
+        st.info(
+            "🎯 **Was mich antreibt:** Daten in verständliche Insights zu verwandeln und damit Prozesse messbar zu verbessern.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # PAGE 2: WERDEGANG (VOLLSTÄNDIG AUS PDF)
-
+# =========================
 elif st.session_state.page == 2:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Beruflicher Werdegang</h1>", unsafe_allow_html=True)
@@ -299,9 +312,9 @@ elif st.session_state.page == 2:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # PAGE 3: KOMPETENZEN
-
+# =========================
 elif st.session_state.page == 3:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Kompetenzen & Skills</h1>", unsafe_allow_html=True)
@@ -364,9 +377,9 @@ elif st.session_state.page == 3:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # PAGE 4: ZERTIFIKATE (MIT DOWNLOAD-LINKS)
-
+# =========================
 elif st.session_state.page == 4:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Zertifikate & Qualifikationen</h1>", unsafe_allow_html=True)
@@ -383,7 +396,7 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_deutsch_b2.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="Deutsch_B2_Zertifikat.pdf",
-                                 mime="application/pdf", key="cert1")
+                                   mime="application/pdf", key="cert1")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
@@ -396,7 +409,7 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_english_b11.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="Englisch_B11_Zertifikat.pdf",
-                                 mime="application/pdf", key="cert2")
+                                   mime="application/pdf", key="cert2")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
@@ -408,7 +421,7 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_english_b12.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="Englisch_B12_Zertifikat.pdf",
-                                 mime="application/pdf", key="cert3")
+                                   mime="application/pdf", key="cert3")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
@@ -420,7 +433,7 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_digital.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="Digital_4.0_Zertifikat.pdf",
-                                 mime="application/pdf", key="cert4")
+                                   mime="application/pdf", key="cert4")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
@@ -431,7 +444,7 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_viona.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="VIONA_Leistungsuebersicht.pdf",
-                                 mime="application/pdf", key="cert5")
+                                   mime="application/pdf", key="cert5")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
@@ -444,15 +457,15 @@ elif st.session_state.page == 4:
         try:
             with open("assets/zertifikat_hochschulreife.pdf", "rb") as f:
                 st.download_button("📄 Zertifikat herunterladen", f, file_name="Hochschulreife_Anerkennung.pdf",
-                                 mime="application/pdf", key="cert6")
+                                   mime="application/pdf", key="cert6")
         except:
             st.warning("📄 Zertifikat noch nicht verfügbar")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # PAGE 5: PROJEKT (DUNKLE SCHRIFT)
-
+# =========================
 elif st.session_state.page == 5:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Praxisprojekt</h1>", unsafe_allow_html=True)
@@ -526,9 +539,9 @@ elif st.session_state.page == 5:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# PAGE 6: PORTFOLIO (MIT ERKLÄRUNG)
-
+# =========================
+# PAGE 6: PORTFOLIO (MIT ERKL ÄRUNG)
+# =========================
 elif st.session_state.page == 6:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Portfolio Dashboard</h1>", unsafe_allow_html=True)
@@ -615,9 +628,9 @@ elif st.session_state.page == 6:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # Navigation Controls
-
+# =========================
 st.markdown("<div class='page-nav'>", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns([1, 1, 1])
@@ -635,9 +648,9 @@ with col3:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-
+# =========================
 # Footer
-
+# =========================
 st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #999; padding: 1rem;'>
