@@ -653,6 +653,6 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #999; padding: 1rem;'>
     <p><strong>Daria Wagner</strong> • Data & Process Analytics</p>
-    <p>Kieselweg 2c, 33415 Verl • dariawag.aw@gmail.com • +49 176 / 305 7 39 89</p>
+    <p>33415 Verl • dariawag.aw@gmail.com • +49 176 / 305 7 39 89</p>
 </div>
 """, unsafe_allow_html=True)
