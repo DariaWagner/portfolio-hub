@@ -171,6 +171,9 @@ elif st.session_state.page == 1:
         st.markdown("### Kontakt")
         st.write("**📍 Ort:** Verl, NRW")
         st.write("**📧 Email:** dariawag.aw@gmail.com")
+        st.write("**📱 Tel:** +49 176 / 305 7 39 89")
+        st.write("**🎂 Geboren:** 20.07.1988")
+        st.write("**🌍 Nationalität:** Russisch")
     
     with col2:
         st.markdown("### Meine Geschichte")
@@ -646,6 +649,6 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #999; padding: 1rem;'>
     <p><strong>Daria Wagner</strong> • Data & Process Analytics</p>
-    <p>Kieselweg 2c, 33415 Verl • dariawag.aw@gmail.com • +49 176 / 305 7 39 89</p>
+    <p>dariawag.aw@gmail.com</p>
 </div>
 """, unsafe_allow_html=True)
