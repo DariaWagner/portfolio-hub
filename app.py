@@ -171,10 +171,7 @@ elif st.session_state.page == 1:
         st.markdown("### Kontakt")
         st.write("**📍 Ort:** Verl, NRW")
         st.write("**📧 Email:** dariawag.aw@gmail.com")
-        st.write("**📱 Tel:** +49 176 / 305 7 39 89")
-        st.write("**🎂 Geboren:** 20.07.1988")
-        st.write("**🌍 Nationalität:** Russisch")
-    
+
     with col2:
         st.markdown("### Meine Geschichte")
         
