@@ -139,6 +139,7 @@ if st.session_state.page == 0:
     st.markdown("""
     <div class='cover-container'>
         <div class='cover-title'>DARIA WAGNER</div>
+        <div class='cover-subtitle'>Fachinformatikerin für</div>
         <div class='cover-subtitle'>Data & Process Analytics</div>
         <p style='font-size: 1.1rem; margin: 1rem 0;'>Portfolio • Lebenslauf • Praxisprojekt</p>
         <p style='font-size: 0.9rem; margin-top: 2rem; opacity: 0.9;'>Praktikum: 01.06.2026 – 02.04.2027</p>
