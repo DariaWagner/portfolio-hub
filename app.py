@@ -375,8 +375,7 @@ elif st.session_state.page == 3:
 elif st.session_state.page == 4:
     st.markdown("<div class='page-container'>", unsafe_allow_html=True)
     st.markdown("<h1 class='section-title'>Zertifikate & Qualifikationen</h1>", unsafe_allow_html=True)
-    
-    st.info("💡 **Hinweis:** Lege deine Zertifikate als PDF im `assets/` Ordner ab, um sie downloadbar zu machen.")
+
     
     col1, col2, col3 = st.columns(3)
     
